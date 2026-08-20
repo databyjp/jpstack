@@ -1,0 +1,3 @@
+interface:
+  display_name: "Reviewable Changes"
+  short_description: "Keep changes reviewable by humans"
