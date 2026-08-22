@@ -22,7 +22,7 @@ In general, prefer specific and accurate statements, rather than vague, emotiona
 1. **Puffery.** "pivotal moment", "testament to", "evolving landscape", "setting the stage for", "indelible mark", "deeply rooted", "honest", "worth <xyz>". Cut puffery, state what happened.
 2. **Name-dropping.** Listing media outlets without context. Pick one, say what was said.
 3. **Vague -ing phrases.** Words like "highlighting...", "ensuring...", "reflecting...", "showcasing...", "fostering..." don't change the communicated mearning. Delete, or if necessary, replace with specificity.
-4. **Promotional language.** Words like "nestled", "vibrant", "breathtaking", "groundbreaking", "renowned", "stunning", "must-visit" don't change the communicated mearning. Delete, or if necessary, replace with specificity.
+4. **Promotional language.** Words like "nestled", "vibrant", "breathtaking", "groundbreaking", "renowned", "stunning", "must-visit" don't change the communicated mearning. Delete, or if necessary, replace with specificity. In most cases, saying "worth noting <xyz>" is redundant. If it's not worth noting, you shouldn't be saying it to me at all. If so, the phrase is by definition redundant.
 5. **Vague attributions.** "Experts believe", "Industry reports suggest", "Some critics argue". Name the source or delete.
 6. **Formulaic challenges.** "Despite challenges... continues to thrive." Replace with specific facts.
 
