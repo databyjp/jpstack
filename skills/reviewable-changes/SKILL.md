@@ -1,20 +1,14 @@
 ---
 name: reviewable-changes
 description: >-
-  Use when writing code someone will review: implementing a feature, fixing a
-  bug, refactoring, adding a module or integration, preparing a pull request.
+  Use before writing code, or working on coding-related tasks.
   Keeps each change small enough to hold in one head.
-  Triggers on broad-sounding tasks ("add search", "migrate X", "build the
-  backend for Y"), on a diff that has spread across several concerns, and on
-  requests to split or salvage a diff that got too big. Not for reviewing
-  someone else's PR, writing commit messages, or resolving merge conflicts.
+  Not for reviewing someone else's PR, writing commit messages, or resolving merge conflicts.
 ---
 
 # Reviewable changes
 
-Producing code is cheap; reviewing it is not. **The size of the change is the
-constraint everything else serves.** Where any instruction competes with
-keeping the change small, small wins. Good design does not earn extra size.
+Producing code is cheap; reviewing it is not. Follow the below steps so that we can prevent unwanted changes, or going in the wrong direction, before things progress too far.
 
 If something is underspecified, call the Skill tool, for "grilling" to clarify intent.
 
