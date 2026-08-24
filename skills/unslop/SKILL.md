@@ -1,42 +1,42 @@
 ---
 name: unslop
-description: ALWAYS use this skill for producing any written output for human consumption; whether it be a message to the user, comments, documents, or code.
+description: You MUST use this skill for producing any text output for human consumption. Applies to almost any text, such as comments, documents, or code. Keep outputs concise and factual.
 ---
 
 # Unslop
 
-Edit text to remove AI patterns and improve output quality.
+Output text without AI patterns to improve output quality and economy.
 
 ## Process
 
-1. Scan for the patterns below.
-2. Rewrite. Preserve meaning, match intended tone.
+1. Read the patterns below.
+2. Avoid the specified tells, or rewrite if necessary.
 3. Self-audit: "What makes this obviously AI generated?" Fix remaining tells.
 
 ## Patterns to detect and fix
 
 ### Content
 
-In general, prefer specific and accurate statements, rather than vague, emotional language.
+In general, write factually and with economy, while **serving a purpose**. Usually that means specific and accurate statements, rather than vague, emotional language. Write in economical, full sentences. Avoid:
 
-1. **Puffery.** "pivotal moment", "testament to", "evolving landscape", "setting the stage for", "indelible mark", "deeply rooted", "honest", "worth <xyz>". Cut puffery, state what happened.
-2. **Name-dropping.** Listing media outlets without context. Pick one, say what was said.
-3. **Vague -ing phrases.** Words like "highlighting...", "ensuring...", "reflecting...", "showcasing...", "fostering..." don't change the communicated mearning. Delete, or if necessary, replace with specificity.
-4. **Promotional language.** Words like "nestled", "vibrant", "breathtaking", "groundbreaking", "renowned", "stunning", "must-visit" don't change the communicated mearning. Delete, or if necessary, replace with specificity. In most cases, saying "worth noting <xyz>" is redundant. If it's not worth noting, you shouldn't be saying it to me at all. If so, the phrase is by definition redundant.
-5. **Vague attributions.** "Experts believe", "Industry reports suggest", "Some critics argue". Name the source or delete.
-6. **Formulaic challenges.** "Despite challenges... continues to thrive." Replace with specific facts.
+1. **Puffery.** "pivotal moment", "testament to", "evolving landscape", "setting the stage for", "indelible mark", "deeply rooted", "honest". Cut puffery, state what happened.
+2. **Vague -ing phrases.** "highlighting...", "ensuring...", "reflecting...", "showcasing...", "fostering..."
+3. **Promotional language.** "nestled", "vibrant", "breathtaking", "groundbreaking", "renowned", "stunning", "must-visit"
+4. **Vague attributions.** "Experts believe", "Industry reports suggest", "Some critics argue". Name the source or delete.
+5. **Formulaic challenges.** "Despite challenges... continues to thrive." Replace with specific facts.
+6. **Unnecessary commentary.** Avoid adjectives that add length without contributing to the narrative. Instead of "The CLAUDE.md here is unusual: it's aimed at AI agents, and it's blunt about it." write "The CLAUDE.md here is unusual in the following ways: <evidence>"
 
 ### Language
 
-In general, communicate concisely BUT clearly, with language that matches the subject matter and the communication context. Prefer direct, factual tones.
+In general, communicate concisely BUT clearly, with language that matches the subject matter and the communication context. Prefer direct, factual tones. Avoid the following:
 
 7. **AI vocabulary.** Additionally, crucial, delve, enduring, enhance, fostering, garner, interplay, intricate, landscape (abstract), pivotal, showcase, tapestry (abstract), testament, underscore, vibrant. Replace with plain words.
-8. **Fancy ways to say "is".** "serves as", "stands as", "boasts", "features". Just say "is" or "has".
+8. **Verbose ways to say "is".** "serves as", "stands as", "boasts", "features". Just say "is" or "has".
 9. **"Not just X, but Y."** State the point directly instead.
 10. **Rule of three.** Forcing ideas into groups of three. Use the natural number.
 11. **Synonym cycling.** Protagonist, main character, central figure, hero all in one paragraph. Pick one, repeat it.
 12. **False ranges.** "from X to Y" where X and Y aren't on a meaningful scale. List topics directly.
-13. **Use first person if appropriate.** Don't always write in third person. After refactoring code, don't write "189 docstring lines down to 125. No signature, type, or assertion changes." Write "I reduced 189 docstring lines down to 125. I did not change signature, type, or assertions."
+13. **Forced third person views.** Use first person if appropriate. After refactoring code, don't write "189 docstring lines down to 125. No signature, type, or assertion changes." Write "I reduced 189 docstring lines down to 125. I did not change signature, type, or assertions."
 
 ### Style
 
