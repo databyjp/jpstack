@@ -28,6 +28,10 @@ questions, recommend answers, revise the current artifact, and stop.
 Clarification is not approval. Advance only after explicit approval of a
 decision-complete artifact.
 
+Keep review rounds small. Start with a short summary and ask no more than three
+unresolved decisions per response. During clarification, show only affected
+sections. Present the complete gate artifact only when it is ready for approval.
+
 ### Product gate
 
 Define the problem in the user's terms, what success means to the end user,
