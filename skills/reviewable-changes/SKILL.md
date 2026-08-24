@@ -1,9 +1,10 @@
 ---
 name: reviewable-changes
 description: >-
-  Use before writing code, or working on coding-related tasks.
+  Use before working on a codebase, e.g. writing code, or working on coding-related tasks.
   Keeps each change small enough to hold in one head.
   Not for reviewing someone else's PR, writing commit messages, or resolving merge conflicts.
+  Not for non-codebase tasks, like creating SVG graphics for example, which involves code but the code isn't the output.
 ---
 
 # Reviewable changes
