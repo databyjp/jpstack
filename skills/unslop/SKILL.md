@@ -1,72 +1,32 @@
 ---
 name: unslop
-description: You MUST use this skill for producing any text output for human consumption. Applies to almost any text, such as comments, documents, or code. Keep outputs concise and factual.
+description: Reviews and revises substantial human-facing prose for concision, specificity, and natural language. Use when writing prose such as long outputs, documents, or even code comments.
 ---
 
 # Unslop
 
-Output text without AI patterns to improve output quality and economy.
+Revise the draft without changing its facts, intent, technical meaning, required format, or requested voice.
 
-## Process
+## Revision pass
 
-1. Read the patterns below.
-2. Avoid the specified tells, or rewrite if necessary.
-3. Self-audit: "What makes this obviously AI generated?" Fix remaining tells.
+- Start with the answer or necessary context. Delete openings such as "Of course!", "Great question!", and "You're absolutely right!"
+- Cut sentences that do not help the reader act or understand. Delete "It is important to note that." Replace "In order to" with "To" and "due to the fact that" with "because."
+- Replace praise and mood with facts. Rewrite "This pivotal release showcases the team's groundbreaking work" to name the release, the change, and who made it.
+- Name mechanisms and measurements. Replace "SQL you can read" with "`.toSQL()` returns the exact string sent to the database." Replace "performance improved significantly" with the measured change.
+- Name the source of attributed claims. Replace "Experts believe" or "Industry reports suggest" with a named source and citation. Delete the claim if no source is available.
+- Replace vague participial phrases with actions or results. Rewrite clauses built around "highlighting," "ensuring," "reflecting," "showcasing," or "fostering" so they state what happened.
+- Prefer plain verbs and words when they preserve meaning. Replace "serves as" with "is," "utilize" with "use," and "facilitate" with "help." Keep established technical terms when a simpler word would be less precise.
+- Remove stock structures. State the point instead of writing "not just X, but Y." Do not invent a third item to make a group of three. Use "from X to Y" only when X and Y are endpoints on a meaningful scale.
+- Keep terminology stable. Do not call the same person "protagonist," "main character," "central figure," and "hero" in one passage.
+- Split sentences that require backtracking. Prefer "The loader parses the file. The compiler validates each query" to a sentence that buries both actions in subordinate clauses.
+- Prefer active voice when the actor matters. Replace "queries are validated" with "the compiler validates queries." Keep passive voice when the actor is unknown or irrelevant.
+- Remove formatting habits that do not aid navigation. Replace "**Performance:** Performance improved" with a direct sentence. "**Schema in TypeScript.** Tables live in one file." is acceptable because the second sentence adds information.
+- Use sentence-case headings, straight quotes, and no decorative emojis or em dashes. Use colons for lists or examples, not in place of a sentence break.
+- Delete canned endings such as "I hope this helps," "Let me know if you need anything else," and "The future looks bright." End with the result, decision, or next step.
 
-## Patterns to detect and fix
+## Final check
 
-### Content
-
-In general, write factually and with economy, while **serving a purpose**. Usually that means specific and accurate statements, rather than vague, emotional language. Write in economical, full sentences. Avoid:
-
-1. **Puffery.** "pivotal moment", "testament to", "evolving landscape", "setting the stage for", "indelible mark", "deeply rooted", "honest". Cut puffery, state what happened.
-2. **Vague -ing phrases.** "highlighting...", "ensuring...", "reflecting...", "showcasing...", "fostering..."
-3. **Promotional language.** "nestled", "vibrant", "breathtaking", "groundbreaking", "renowned", "stunning", "must-visit"
-4. **Vague attributions.** "Experts believe", "Industry reports suggest", "Some critics argue". Name the source or delete.
-5. **Formulaic challenges.** "Despite challenges... continues to thrive." Replace with specific facts.
-6. **Unnecessary commentary.** Avoid adjectives that add length without contributing to the narrative. Instead of "The CLAUDE.md here is unusual: it's aimed at AI agents, and it's blunt about it." write "The CLAUDE.md here is unusual in the following ways: <evidence>"
-
-### Language
-
-In general, communicate concisely BUT clearly, with language that matches the subject matter and the communication context. Prefer direct, factual tones. Avoid the following:
-
-7. **AI vocabulary.** Additionally, crucial, delve, enduring, enhance, fostering, garner, interplay, intricate, landscape (abstract), pivotal, showcase, tapestry (abstract), testament, underscore, vibrant. Replace with plain words.
-8. **Verbose ways to say "is".** "serves as", "stands as", "boasts", "features". Just say "is" or "has".
-9. **"Not just X, but Y."** State the point directly instead.
-10. **Rule of three.** Forcing ideas into groups of three. Use the natural number.
-11. **Synonym cycling.** Protagonist, main character, central figure, hero all in one paragraph. Pick one, repeat it.
-12. **False ranges.** "from X to Y" where X and Y aren't on a meaningful scale. List topics directly.
-13. **Forced third person views.** Use first person if appropriate. After refactoring code, don't write "189 docstring lines down to 125. No signature, type, or assertion changes." Write "I reduced 189 docstring lines down to 125. I did not change signature, type, or assertions."
-
-### Style
-
-14. **Em dash and colons.** Avoid em dashes entirely. Use periods or commas only. If a thought needs separation, end the sentence or use a comma.
-15. **Colon overuse.** Colons are fine before a list or example. Not as mid-sentence connectors. "If you're coming from traditional automation: instead of registering event handlers, you describe conditions" adds nothing with the colon. Rewrite to let the point stand on its own without comparison framing. "Describing when the scheduler should fire works best as plain English." Same meaning, no crutch punctuation.
-16. **Boldface overuse.** Don't bold every proper noun or acronym.
-17. **Inline-header lists.** The tell is a bold label and colon that restates the line: "**Performance:** Performance improved...". Convert those to prose. A bold lead-in that ends in a period, names the item, and is followed by genuinely new detail ("**Schema in TypeScript.** Tables live in one file.") is fine, not a tell.
-18. **Title case headings.** Use sentence case.
-19. **Decorative emojis.** Remove from headings and bullets.
-20. **Curly quotes.** Replace with straight quotes.
-
-### Communication artifacts
-
-21. **Chatbot phrases.** "I hope this helps!", "Let me know if...", "Of course!", "Certainly!", "Found the smoking gun!" Remove.
-22. **Sycophantic tone.** "Great question! You're absolutely right!" Respond directly.
-
-### Filler
-
-23. **Filler phrases.** "In order to" becomes "To". "Due to the fact that" becomes "Because". "It is important to note that" gets deleted.
-24. **Excessive hedging.** "could potentially possibly be argued that it might" becomes "may".
-25. **Generic conclusions.** "The future looks bright." State specific plans or facts.
-
-### Jargon
-
-26. **Abstract metaphor nouns.** Substrate, wedge, vector, locus, vantage, nexus, primitive (as noun), harness (as metaphor), surface (as in "API surface"), bedrock, scaffolding (as metaphor), modality, paradigm, gold-plating, ratchet (as metaphor), evacuate (for moving code), endgame, north star, flywheel. These read as technical but usually have a plainer concrete word. "Substrate" becomes "base". "Wedge in" becomes "add". "Vector" becomes "way" or "method". "Gold-plating" becomes "more than the job needs". "Ratchet" becomes the mechanism's real name or "a limit that only tightens". "Evacuate" becomes "move out". "Endgame" becomes "the last phase". Pick the concrete word.
-
-### Plain speech
-
-27. **Say what it does, not how it feels.** "the database stays close at hand", "SQL you can read", "types that follow your schema" name a feeling. The fix names the mechanism or a number: "`.toSQL()` returns the exact string sent to the database", "a column rename fails the build". Ask what the sentence tells the reader to do or know, then write that. If you can't restate it as a concrete instruction, fact, or number, cut it. One more check: if the sentence could appear unchanged in another project's docs, it says nothing about this one. Cut it.
-28. **Shorten or split dense sentences.** If the reader has to backtrack to parse a sentence, break it in two or drop clauses. One idea per sentence.
-29. **Active voice.** Prefer it. Catch "is/are/was/were + past participle" and name the actor: "queries are validated" becomes "the compiler validates queries", "the file is parsed by the loader" becomes "the loader parses the file". Passive is fine only when the actor is unknown or genuinely doesn't matter.
-30. **Cut adverbs, or use a stronger verb.** "runs quickly" becomes "is fast" or the number. "significantly improves" becomes the measured delta. An adverb propping up a weak verb means the verb is wrong.
-31. **Prefer the plain word.** "utilize" becomes "use", "leverage" becomes "use", "facilitate" becomes "help", "numerous" becomes "many", "in the event that" becomes "if". The fancier synonym is rarely clearer.
+- Does every sentence add a fact, decision, instruction, example, or necessary context?
+- Could any sentence appear unchanged in another project's documentation? If so, make it specific or delete it.
+- Are claims tied to evidence or a named source?
+- Did the revision preserve exact quotations, identifiers, technical terms, required formats, and the user's voice?
