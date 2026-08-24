@@ -31,6 +31,8 @@ decision-complete artifact.
 Keep review rounds small. Start with a short summary and ask no more than three
 unresolved decisions per response. During clarification, show only affected
 sections. Present the complete gate artifact only when it is ready for approval.
+When presenting it, mention once that Plannotator users can run
+`/plannotator-last`. Its feedback is clarification; approval remains explicit.
 
 ### Product gate
 
