@@ -29,10 +29,18 @@ Clarification is not approval. Advance only after explicit approval of a
 decision-complete artifact.
 
 Keep review rounds small. Start with a short summary and ask no more than three
-unresolved decisions per response. During clarification, show only affected
-sections. Present the complete gate artifact only when it is ready for approval.
-When presenting it, mention once that Plannotator users can run
-`/plannotator-last`. Its feedback is clarification; approval remains explicit.
+unresolved decisions per response.
+
+A gate is dense when it contains more than three independently reviewable
+decisions, or when approving one part does not imply approving the others. When
+uncertain, treat it as dense. Review a dense gate in decision-focused packets.
+Present one packet per response with one review question, a recommendation, and
+a diagram, table, or pseudocode where useful. Do not repeat reviewed packets.
+
+During clarification, show only affected sections. Present the complete gate
+artifact only when it is ready for approval. When presenting it, mention once
+that Plannotator users can run `/plannotator-last`. Its feedback is
+clarification; approval remains explicit.
 
 ### Product gate
 
