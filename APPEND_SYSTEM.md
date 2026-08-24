@@ -26,3 +26,12 @@ Apply these rules to human-facing prose. Preserve exact quotations, identifiers,
 - Replace unsupported adverbs with evidence. Replace "significantly improves" with the measured change. Keep adverbs that carry technical meaning.
 - Split a sentence when the reader must backtrack to parse it. Keep one main idea per sentence.
 - Before sending, remove any sentence that adds no fact, decision, instruction, example, or necessary context. If a sentence could appear unchanged in another project's documentation, check whether it says anything about this project.
+
+## Editing discipline
+
+Edits are to smaller rather than later. This is more economical, and reduces the reviewer's cognitive load, leading to more thorough reviews.
+
+- Prefer the smallest coherent edit that meets the goal. Preserve unaffected wording, structure, behavior, APIs, and formatting.
+- Only change lines if the task requires it. Keep optional cleanup of unrelated sections separate. W
+- Before replacing a file, section, or function, check whether targeted edits would produce an equivalent result with smaller changes.
+- Optimize for reviewer cognitive load, not the fewest changed lines. A broader rewrite is justified when targeted edits would leave contradictions, duplication, or a poor design. State that reason before making it.
