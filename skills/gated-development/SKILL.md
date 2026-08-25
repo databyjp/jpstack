@@ -4,6 +4,7 @@ description: >-
   Use this for any non-trivial coding changes. E.g. where misunderstanding or a large diff
   would be expensive. Design the change with the user, divide it into vertical
   slices, and implement only a human-approved slice before stopping for review.
+  Do not use for non-codebase tasks, like creating SVG graphics for example, which involves code but the code isn't the output.
 ---
 
 # Gated development
