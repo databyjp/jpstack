@@ -1,112 +1,129 @@
 ---
 name: gated-development
 description: >-
-  Use this for any non-trivial coding changes. E.g. where misunderstanding or a large diff
-  would be expensive. Design the change with the user, divide it into vertical
-  slices, and implement only a human-approved slice before stopping for review.
-  Do not use for non-codebase tasks, like creating SVG graphics for example, which involves code but the code isn't the output.
+  Use for non-trivial codebase changes where misunderstanding or a large diff
+  would make review or rework expensive. Design with the user, then implement
+  one approved slice at a time. Do not use when code is only a means to produce
+  a non-code artifact.
 ---
 
 # Gated development
 
-The human approves each design gate and implementation slice.
+The human approves the design and each implementation slice.
 
 ## Choose a lane
 
 - **Small:** obvious, low-risk, and easy to review. Implement directly.
-- **Gated:** everything else; misunderstanding or a large diff would be slower, add re-work, or lower quality. Follow the gates below.
+- **Gated:** everything else. Follow the gates below.
 
-State which lane you recommend. When uncertain, use the gated lane.
+State the recommended lane. When uncertain, use Gated.
 
-## Gated sequence
+## Gate protocol
 
-Run Product, System, Program, Slice, and Execution gates in order. Work on one
-gate at a time using only prior approved decisions. Use read-only tools before
-execution.
+Run Product, System, Program, Slice, and Execution in order. Use only approved
+prior decisions and read-only tools until Execution.
 
-A gate may take several rounds. While decisions remain, ask only unblocked
-questions, recommend answers, revise the current artifact, and stop.
-Clarification is not approval. Advance only after explicit approval of a
-decision-complete artifact.
+For each gate:
 
-Keep review rounds small. Start with a short summary and ask no more than three
-unresolved decisions per response.
+1. Identify only the decisions that block the next gate. Defer decisions that
+   can safely wait for a later gate.
+2. Present one decision packet: the decision, recommendation, main trade-off,
+   and one focused question. Use `ask_user_question` for two to four concrete
+   choices.
+3. Record the answer in a decision ledger. In later rounds, show only changed
+   entries and the next open decision.
+4. Once settled, show the compact ledger and deferred decisions, then ask for
+   explicit gate approval.
 
-A gate is dense when it contains more than three independently reviewable
-decisions, or when approving one part does not imply approving the others. When
-uncertain, treat it as dense. Review a dense gate in decision-focused packets.
-Present one packet per response with one review question, a recommendation, and
-a diagram, table, or pseudocode where useful. Do not repeat reviewed packets.
+Do not ask ceremonial questions when the prompt or an approved decision already
+provides the answer. Clarification is not approval, and the final ledger must
+not introduce decisions. Do not repeat one contract as a file tree, call path,
+invariant list, and error table unless each view helps decide something.
 
-During clarification, show only affected sections. Present the complete gate
-artifact only when it is ready for approval. When presenting it, mention once
-that Plannotator users can run `/plannotator-last`. Its feedback is
-clarification; approval remains explicit.
+When presenting a final gate ledger, mention once that Plannotator users can run
+`/plannotator-last`. Its feedback is clarification; approval remains explicit.
+
+### Example
+
+For a request to delegate graphic creation between repositories, start with this
+Product decision packet:
+
+- **Decision:** Should the first milestone prove one real handoff?
+- **Recommendation:** Yes. One request should produce a project-owned graphic
+  while standalone designer use still works.
+- **Trade-off:** This tests the workflow early but requires orchestration design.
+- **Question:** Approve a one-graphic pilot?
+
+Do not include exact output paths, agent configuration, or missing-file checks
+in this gate. Those belong to System or Program.
+
+A narrow first slice could prove that the producer invokes the designer in
+plan-only mode and that the designer reads its repository instructions. Defer
+rendering, output-path validation, variants, and documentation.
 
 ### Product gate
 
-Define the problem in the user's terms, what success means to the end user,
-non-goals, and open product decisions. Separate high-level user goals and
-concrete post-use measures from acceptance criteria and non-negotiable
-invariants. Recommend measurable thresholds for human approval. For
-user-visible output, consider a rough mockup rather than relying on prose alone.
+Agree on the problem, user-visible outcome, and non-goals. Include only
+criteria a user can evaluate without knowing the implementation.
 
-Do not propose system or program design yet. Stop for product approval.
+Defer paths, filenames, repository placement, invocation mechanics, validation
+cases, and recovery mechanics unless the user explicitly made one a product
+constraint. Stop for approval.
 
 ### System gate
 
-Using the approved product brief, define changed contracts, data flow,
-dependencies, external systems, and failure paths. Separate unresolved choices
-from recommendations.
+Agree on changed contracts, data flow, dependencies, external systems, and
+failure paths. Separate open choices from recommendations.
 
-Do not propose files, internal types, or implementation slices yet. Stop for
-system approval.
+Do not propose files, internal types, or slices. Stop for approval.
 
 ### Program gate
 
-Using the approved system design, present the file-tree diff, changed call
-paths, key types and signatures, invariants, and error modes. Use the
-`codebase-design` skill when an interface or seam needs designing.
+Agree on the implementation shape. Use `codebase-design` when designing an
+interface or seam. Resolve these separately when they are independent:
 
-Do not plan implementation slices yet. Stop for program approval.
+- interface, ownership, and call path
+- durable data, file locations, and naming
+- enforcement, errors, and recovery
+
+Show file trees, signatures, invariants, or error cases only when they constrain
+implementation or expose a choice. Treat an invariant as an open decision if
+the design cannot enforce or probe it.
+
+Do not plan slices. Stop for approval.
 
 ### Slice gate
 
-Using the approved program design, propose ordered vertical slices. A vertical
-slice produces behavior that a user or external caller can exercise across
-every required technical layer. A technical layer alone is not a slice. Name
-any temporary substitution and the later slice that removes it.
+Propose ordered vertical slices. Each slice must deliver one observable behavior
+or test one risky assumption with the smallest end-to-end probe. Split
+independently rejectable behavior. Defer generalization, variants,
+documentation, migration, cleanup, and hardening unless required by the slice.
 
-For every slice, state:
+For each slice, state:
 
-- Observable behavior
-- Automated test and manual probe
-- Files expected to change
-- Explicit exclusions
-- Review budget
+- behavior or assumption
+- automated test, manual probe, and stop condition
+- expected files
+- exclusions and deferred behavior
+- review budget
 
-Prefer 100-200 lines of code for uncertain work. Any larger budget
-requires explicit human approval. Stop for approval of the slice plan.
+Prefer 100-200 lines for uncertain work, and less when a smaller probe suffices.
+Larger budgets require explicit approval. Stop for approval of the slice plan.
 
 ## Execution gate
 
-Before editing, restate the approved slice using the five fields above.
+Restate the approved slice using the five fields above, then:
 
-Then:
+1. Implement only its smallest end-to-end path.
+2. Stop and return to the relevant gate if a contract, file, or budget must
+   change.
+3. Run the agreed test and probe, or state why a probe cannot run.
+4. Check the final diff for changes outside the approved scope.
+5. Report the result and stop for review.
 
-1. Implement only the smallest end-to-end path. Do not add later behavior,
-   unrelated cleanup, reformatting, or dependency changes.
-2. If the work requires a changed contract, an unapproved file, or more than
-   the review budget, stop and return to the relevant earlier gate.
-3. Run the agreed automated test and manual probe. If a probe cannot be run,
-   state why rather than silently skipping it.
-4. Inspect the final diff for changes outside the approved scope.
-5. Report the result and stop for human review.
-
-Do not begin another slice without another approval.
+Do not begin another slice without approval.
 
 ## Review report
 
-Use the `jp-coding-preferences-reporting` skill. Report scope, reading order,
-what did not change, validation, the weakest point, the decision requested, and
-follow-ups.
+Use `jp-coding-preferences-reporting`. Report scope, reading order, unchanged
+behavior, validation, the weakest point, the requested decision, and follow-ups.
