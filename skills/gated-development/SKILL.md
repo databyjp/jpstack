@@ -43,12 +43,14 @@ run `/plannotator-last`. Its feedback is clarification, not approval.
 
 ## Product outcome
 
-Agree on the problem, user-visible outcome, and non-goals. Include only criteria
-a user can evaluate without knowing the implementation.
+Agree on the problem, user-visible outcome, and non-goals. Write the outcome as
+black-box behavior: could the user verify each statement without knowing which
+modules, repositories, files, or agents implement it? If not, defer it to a
+design packet.
 
-Defer paths, filenames, repository placement, invocation mechanics, validation
-cases, and recovery mechanics unless the user made one a product constraint.
-Stop for explicit Product approval.
+Product outcomes describe what the user does, receives, or retains, not workflow
+steps. Technical details belong here only when the user made one a product
+constraint. Stop for explicit Product approval.
 
 ## Conditional design
 
@@ -103,15 +105,19 @@ Do not begin another change without approval.
 
 ## Example
 
-After approving the outcome "one producer request can delegate one graphic,"
-do not design every output rule. State the assumption: Pi can discover the
-project designer and start it in the designer repository.
+For a graphics workflow:
 
-Propose a probe that adds the minimum agent profile and invokes it in plan-only
-mode. The stop condition is that it reads the designer instructions and returns
-without writing files. Retain the profile if the probe succeeds; otherwise
-discard or revise it. Defer rendering, output paths, variants, and documentation
-until the evidence shows delegation works.
+- **Product:** One request from `video-producer` returns a reviewable graphic
+  owned by the selected video project.
+- **Not Product:** The producer creates a canonical brief and delegates it to a
+  designer without copying it between repositories.
+
+After Product approval, state the design assumption: the agent harness can
+discover the project designer and start it in the designer repository. Propose a plan-only probe that
+adds the minimum agent profile. Stop when it reads the designer instructions and
+returns without writing files. Retain the profile if the probe succeeds;
+otherwise revise or discard it. Defer rendering, output paths, variants, and
+documentation until delegation works.
 
 ## Review report
 
