@@ -36,34 +36,29 @@ most of the proposed change. Otherwise state a reversible assumption and use a
 probe.
 
 A decision packet contains the decision, recommendation, main trade-off, and one
-question. Ask the user (e.g. use `ask_user_question`) for concrete choices. Do not repeat settled background.
-A decision answer is clarification, not implementation approval.
-
-When presenting a final decision record, mention once that Plannotator users can
-run `/plannotator-last`. Its feedback is clarification, not approval.
+question. Ask the user (for example, with `ask_user_question`) for concrete
+choices. Do not repeat settled background. A decision answer is clarification,
+not implementation approval.
 
 ## Product outcome
 
-Agree on the problem, user-visible outcome, and non-goals. Write the outcome as
-black-box behavior: could the user verify each statement without knowing which
-modules, repositories, files, or agents implement it? If not, defer it to a
-design packet.
-
-Product outcomes describe what the user does, receives, or retains, not workflow
-steps. Technical details belong here only when the user made one a product
-constraint. Stop for explicit Product approval.
+Agree on the problem, user-visible outcome, and non-goals. State them as
+black-box behavior that a user can verify without knowing the implementation.
+Keep workflow and technical design out unless the user made them product
+constraints. Stop for explicit Product approval.
 
 ## Conditional design
 
-Use a design packet only when the next safe change depends on it:
-
-- **System:** contracts, data flow, dependencies, external systems, or failures.
-- **Program:** interface and ownership, durable data and locations, or
-  enforcement and recovery. Use `codebase-design` for an interface or seam.
+Use a design packet only when the next safe change depends on a contract,
+interface, ownership, data location, or failure decision. Use `codebase-design`
+when choosing an interface or seam.
 
 Show file trees, signatures, invariants, or errors only when they constrain the
 next change. Prefer executable sources of truth such as a compiling interface,
-contract test, narrow adapter, dry run, or walking skeleton.
+contract test, narrow adapter, dry run, or walking skeleton. Do not add a module
+seam merely to wrap a probe. Introduce an interface only when it is under review
+or the retained capability has a real caller; otherwise use a small executable
+harness.
 
 ## Change types
 
@@ -78,10 +73,10 @@ retained, revised, or discarded, and stop when the question is answered.
 When interaction between proven parts becomes the riskiest assumption, use a
 probe that integrates only those parts.
 
-"Probe" describes the change and its evidence, not necessarily a durable module
-or directory. Disposable code may live in an isolated experiment location. If
-retained, place and name it by its lasting responsibility, or explicitly approve
-keeping it as a diagnostic tool.
+"Probe" describes the experiment, not the implementation. Do not use `Probe`,
+`runProbe`, or similar lifecycle names for retained modules, interfaces, or
+directories. Name retained code by the capability it provides. A disposable
+probe may use a script entry point without introducing a reusable interface.
 
 ### Production slice
 
@@ -93,18 +88,15 @@ For either change type, state:
 
 - question or observable behavior
 - assumption and approved constraints
-- automated test, manual probe, and stop condition
+- validation and stop condition
 - expected files
-- working checkpoint
-- excluded downstream parts and other deferred work
+- working checkpoint and deferred downstream work
 - review budget
 
 Prefer 20-50 changed lines for a probe and 100-200 for uncertain production
-work. State a review-size cap for normally formatted human-authored code and name
-any generated files excluded from it. Use the project formatter before measuring.
-Do not combine statements, collapse data, or avoid readable structure to meet the
-cap. If normal formatting exceeds it, reduce scope or get approval before more
-edits.
+work. Set a review-size cap for normally formatted human-authored code and name
+generated exclusions. Never compress formatting to meet the cap. If readable
+code exceeds it, reduce scope or get approval before continuing.
 
 ## Execution
 
@@ -122,25 +114,8 @@ Restate the approved change, then:
 
 Do not begin another change without approval.
 
-## Example
-
-For a graphics workflow:
-
-- **Product:** One request from `video-producer` returns a reviewable graphic
-  owned by the selected video project.
-- **Not Product:** The producer creates a canonical brief and delegates it to a
-  designer without copying it between repositories.
-
-After Product approval, state the design assumption: the agent harness can
-discover the project designer and start it in the designer repository. Propose a plan-only probe that
-adds the minimum agent profile. Stop when it reads the designer instructions and
-returns without writing files. Retain the profile if the probe succeeds;
-otherwise revise or discard it. Defer rendering, output paths, variants, and
-documentation until delegation works.
-
 ## Review report
 
-Use `jp-coding-preferences-reporting`. Report approved versus actual files and
-normally formatted human-authored changed lines, each named constraint as passed,
-failed, or deferred, reading order, unchanged behavior, validation, the weakest
-point, the requested decision, and follow-ups.
+Use `jp-coding-preferences-reporting`. In addition, compare approved and actual
+files and review size, and classify each approved constraint as passed, failed,
+or deferred.
