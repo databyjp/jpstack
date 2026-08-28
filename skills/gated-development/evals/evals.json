@@ -15,9 +15,9 @@
     {
       "id": "allow-required-integration",
       "prompt": "The repository already has tested order persistence and email delivery modules. The open risk is whether completing an order commits it and sends exactly one receipt through the real queue. Propose the next gated change.",
-      "expected_output": "Proposes an integration probe crossing the proven modules because their interaction is the single uncertainty.",
+      "expected_output": "Proposes an integration checkpoint crossing the proven modules because their interaction is the single uncertainty.",
       "assertions": [
-        "The checkpoint is classified as an integration probe.",
+        "The checkpoint is classified as an integration checkpoint.",
         "The primary assertion is one behaviorally trivial cross-module result.",
         "The proposal does not split the required interaction into non-executable fragments.",
         "Behavior outside the named interaction is explicitly deferred."
@@ -26,9 +26,10 @@
     {
       "id": "reject-interface-only-fragment",
       "prompt": "We need a new payment connector, but do not yet know whether the provider SDK supports idempotency keys. Propose the smallest first change.",
-      "expected_output": "Proposes an executable capability probe against the SDK instead of an interface-only design or a full connector implementation.",
+      "expected_output": "Proposes a retained capability checkpoint against the intended SDK instead of raw HTTP, an interface-only design, or a full connector implementation.",
       "assertions": [
         "The primary assertion directly tests provider idempotency behavior.",
+        "The implementation path uses the intended production language and provider SDK.",
         "The checkpoint includes an executable harness or test and one validation observation.",
         "It does not introduce a reusable connector interface without a real caller or interface decision.",
         "It defers production connector behavior that is not needed for the assertion."

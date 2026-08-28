@@ -25,7 +25,7 @@ State the recommended lane. When uncertain, use Gated.
 1. Agree on the Product outcome.
 2. Identify the riskiest current assumption or next observable behavior.
 3. Define one executable checkpoint and apply the split test.
-4. Get explicit approval for its contract and review budget.
+4. Get explicit approval for its contract and review target.
 5. Implement, validate, report the evidence, and stop.
 6. Record durable decisions, then propose the next checkpoint.
 
@@ -62,22 +62,29 @@ to observe the assertion.
 
 ## Checkpoint kinds
 
-- **Capability probe:** tests one uncertain mechanism, dependency, compatibility
-  claim, or performance property. It may stop at one seam and use a disposable
-  executable harness.
-- **Integration probe:** tests one uncertain interaction between named parts.
-  Exercise one behaviorally trivial path; stub parts outside that interaction.
+- **Capability checkpoint:** proves one uncertain mechanism using the intended
+  production stack when known. Keep its behavior narrow and retain the code.
+- **Disposable spike:** answers a question whose code should not enter the
+  product. Use one only when throwaway work is materially cheaper or production
+  concerns would obscure the evidence.
+- **Integration checkpoint:** tests one uncertain interaction between named
+  parts. Exercise one behaviorally trivial path; stub parts outside it.
 - **Production slice:** delivers one retained observable behavior through the
   minimum path it inherently requires.
+
+Default to retained code. When the intended language, SDK, and lasting
+responsibility are known, use them unless the primary assertion concerns a
+lower-level protocol. Do not choose raw HTTP, a temporary language, or a
+throwaway harness merely to reduce the file or line budget.
 
 Split independently rejectable behavior. Defer generalization, variants,
 documentation, migration, cleanup, and hardening unless the primary assertion
 requires them.
 
-"Probe" describes the experiment, not the implementation. Do not use `Probe`,
-`runProbe`, or similar lifecycle names for retained modules, interfaces, or
-directories. Name retained code by its capability. A disposable probe may use a
-script entry point without introducing a reusable interface.
+Checkpoint kinds describe the change, not the implementation. Name retained
+modules, interfaces, and directories by their capability, not `Probe` or another
+lifecycle term. A disposable spike may use a script entry point without a
+reusable interface.
 
 ## Conditional design
 
@@ -88,36 +95,45 @@ when choosing an interface or seam.
 Show file trees, signatures, invariants, or errors only when they constrain the
 checkpoint. Prefer executable sources of truth such as a compiling interface
 with a real caller, contract test, narrow adapter, dry run, or walking skeleton.
-Do not add a module seam merely to wrap a probe.
+Do not add a module seam merely to wrap a checkpoint.
 
 ## Checkpoint contract
 
 Present this compact contract for approval:
 
-- **Kind:** capability probe, integration probe, or production slice
+- **Kind:** capability checkpoint, disposable spike, integration checkpoint, or
+  production slice
 - **Primary assertion:** one falsifiable pass/fail claim
+- **Implementation path:** intended language and significant dependencies;
+  explain any departure from the planned production stack
 - **Validation:** one primary command or observation
 - **Expected files:** closed list
 - **Do not implement:** named adjacent and downstream behavior
-- **Stop when:** evidence passes, fails, or the budget expires
-- **Disposition:** discard, rewrite for production, or retain
-- **Review budget:** cap for normally formatted human-authored code; name
-  generated exclusions
+- **Stop when:** evidence passes, fails, or scope must materially expand
+- **Disposition:** retain, or discard with a concrete reason retained code would
+  cost more or weaken the evidence
+- **Review target:** approximate size of normally formatted maintained code;
+  name generated artifacts excluded from review
 
-The review budget limits size after the checkpoint passes the split test. Prefer
-20-50 changed lines for a probe and 100-200 for uncertain production work, but
-use less when possible. Never compress formatting to meet the cap. If readable
-code or the expected file set exceeds approval, reduce scope or ask to expand it
-before continuing.
+The expected-file list constrains scope, not project structure. Include ordinary
+configuration, dependency, source, and test files when retained code needs them.
+The review target estimates cognitive load after the checkpoint passes the split
+test. Prefer roughly 20-50 changed lines for a disposable spike and 100-200 for
+uncertain retained work, but size varies with language and scaffolding. The target is not
+a quota. Do not compress formatting or choose a less suitable implementation to
+meet it. A modest overrun does not require approval. Stop when growth introduces
+a new responsibility, independently rejectable behavior, unexpected file
+category, or materially larger review surface.
 
 ## Execution
 
 Restate the approved contract, then:
 
 1. Implement only what the primary assertion requires.
-2. Track actual files and normally formatted human-authored changed lines.
-3. Stop before further edits if a constraint, file set, assertion, or budget must
-   change. Ask whether to trim the checkpoint or expand approval.
+2. Track actual files and the approximate maintained-code review surface.
+3. Stop before further edits if the primary assertion, approved constraints, or
+   conceptual scope must expand. Ordinary scaffolding and modest size variance
+   do not require approval.
 4. Run the approved validation, or state why it cannot run.
 5. Map every changed file to the primary assertion. Revert unrelated changes.
 6. Classify each approved constraint as passed, failed, or deferred. Confirm that
@@ -128,14 +144,15 @@ Restate the approved contract, then:
 ## Split example
 
 Too broad: prove corpus growth, map budgeting, omitted-detail recovery, and
-provenance in one probe.
+provenance in one checkpoint.
 
-Focused: prove that filtered hybrid retrieval returns one expected source-linked
-KI within a limit of three. Defer growth and maps. Test their interaction later
-only when that interaction becomes the primary uncertainty.
+Focused: using the intended SDK, prove that filtered hybrid retrieval returns one
+expected source-linked KI within a limit of three. Defer growth and maps. Test
+their interaction later only when that interaction becomes the primary
+uncertainty.
 
 ## Review report
 
 Use `jp-coding-preferences-reporting`. In addition, compare approved and actual
-files and review size, report the primary assertion as passed, failed, or
+files and review surface, report the primary assertion as passed, failed, or
 unverified, and confirm excluded behavior remains absent.
