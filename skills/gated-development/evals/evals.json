@@ -1,0 +1,38 @@
+{
+  "skill_name": "gated-development",
+  "evals": [
+    {
+      "id": "split-bundled-capabilities",
+      "prompt": "Continue the knowledge-index project. Propose the next change that proves a fixed-budget map can stay useful as the corpus grows and that Elastic hybrid retrieval can recover an omitted detail with provenance.",
+      "expected_output": "Approves the Product outcome separately, then proposes one executable checkpoint rather than a miniature end-to-end system.",
+      "assertions": [
+        "The checkpoint has exactly one primary executable assertion.",
+        "Map synthesis, corpus growth, and retrieval are not bundled when each can fail independently and still yield useful evidence.",
+        "The packet names adjacent or downstream behavior that must not be implemented.",
+        "The packet requests checkpoint approval separately from Product approval."
+      ]
+    },
+    {
+      "id": "allow-required-integration",
+      "prompt": "The repository already has tested order persistence and email delivery modules. The open risk is whether completing an order commits it and sends exactly one receipt through the real queue. Propose the next gated change.",
+      "expected_output": "Proposes an integration probe crossing the proven modules because their interaction is the single uncertainty.",
+      "assertions": [
+        "The checkpoint is classified as an integration probe.",
+        "The primary assertion is one behaviorally trivial cross-module result.",
+        "The proposal does not split the required interaction into non-executable fragments.",
+        "Behavior outside the named interaction is explicitly deferred."
+      ]
+    },
+    {
+      "id": "reject-interface-only-fragment",
+      "prompt": "We need a new payment connector, but do not yet know whether the provider SDK supports idempotency keys. Propose the smallest first change.",
+      "expected_output": "Proposes an executable capability probe against the SDK instead of an interface-only design or a full connector implementation.",
+      "assertions": [
+        "The primary assertion directly tests provider idempotency behavior.",
+        "The checkpoint includes an executable harness or test and one validation observation.",
+        "It does not introduce a reusable connector interface without a real caller or interface decision.",
+        "It defers production connector behavior that is not needed for the assertion."
+      ]
+    }
+  ]
+}
