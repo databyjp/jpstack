@@ -78,8 +78,12 @@ lower-level protocol. Do not choose raw HTTP, a temporary language, or a
 throwaway harness merely to reduce the file or line budget.
 
 Split independently rejectable behavior. Defer generalization, variants,
-documentation, migration, cleanup, and hardening unless the primary assertion
-requires them.
+standalone documentation, migration, cleanup, and hardening unless the primary
+assertion requires them.
+
+Docstrings and comments needed to understand or safely change retained code are
+part of the implementation, not deferred documentation. Prefer clear names and
+types; use the `docstrings` skill for non-obvious contracts or local constraints.
 
 Checkpoint kinds describe the change, not the implementation. Name retained
 modules, interfaces, and directories by their capability, not `Probe` or another

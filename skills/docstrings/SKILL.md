@@ -1,7 +1,9 @@
 ---
 name: docstrings
 description: >-
-  Use when writing, editing or reviewing docstrings and code comments.
+  Use when writing or reviewing code with non-obvious contracts, side effects,
+  failure modes, ownership, ordering, units, or local constraints, and whenever
+  writing or editing docstrings and comments.
 ---
 
 # Docstrings
