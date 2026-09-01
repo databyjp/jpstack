@@ -1,31 +1,22 @@
 {
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.84.4",
   "defaultProvider": "openrouter",
-  "defaultModel": "z-ai/glm-5.3-flash",
+  "defaultModel": "openai/gpt-5.6-luna",
   "packages": [
     "npm:@agnishc/edb-session-manager",
     "npm:@plannotator/pi-extension",
     {
       "source": "/Users/jphwang/.config/nono/packages/always-further/pi"
     },
-    "npm:pi-openrouter-session",
-    "npm:context-mode",
     "npm:@ff-labs/pi-fff",
-    "npm:pi-web-access"
+    "npm:pi-web-access",
+    "npm:@juicesharp/rpiv-todo",
+    "npm:pi-lens",
+    "npm:pi-calm",
+    "npm:@henryqw/pi-notes"
   ],
   "defaultThinkingLevel": "high",
-  "otel": {
-    "enabled": true,
-    "protocol": "grpc",
-    "serviceName": "pi-search-devrel",
-    "captureContent": "metadata_only",
-    "sampleRatio": 1,
-    "signals": {
-      "traces": true,
-      "metrics": true,
-      "logs": true
-    },
-    "logLevel": "info"
-  },
+  "hideThinkingBlock": true,
+  "quietStartup": true,
   "theme": "dark"
 }
