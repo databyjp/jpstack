@@ -32,6 +32,10 @@ Add the Pi wrapper to `~/.zshrc`:
 
 ```shell
 pi() {
-    nono run --profile pi-mise --allow-cwd -- pi "$@"
+    nono run --profile pi-mise --allow-cwd -- "$PI_BIN" "$@"
+}
+
+yolopi() {
+    "$PI_BIN" "$@"
 }
 ```
