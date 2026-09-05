@@ -5,7 +5,7 @@
   "meta": {
     "name": "pi-mise",
     "version": "",
-    "description": "Pi sandbox with a mise-managed Node runtime",
+    "description": "Pi sandbox with a mise-managed Node and Python runtimes",
     "author": null
   },
   "security": {
@@ -30,14 +30,23 @@
       "$WORKDIR",
       "$HOME/.pi",
       "$HOME/code/agents",
-      "~/.pi-lens"
+      "~/.pi-lens",
+      "~/.plannotator"
     ],
     "read": [
       "$HOME/.local/share/mise/installs/node",
+      "$HOME/.local/share/mise/installs/python",
       "~/.worktrees",
-      "~/code"
+      "~/code",
+      "~/.claude"
     ],
-    "write": [],
+    "write": [
+      "~/.plannotator/feedback"
+    ],
+    "allow_file": [
+      "~/.plannotator/config.json"
+    ],
+    "read_file": [],
     "write_file": [],
     "unix_socket": [],
     "unix_socket_bind": [],
