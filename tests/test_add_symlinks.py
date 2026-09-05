@@ -6,14 +6,14 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-BOOTSTRAP = REPO_ROOT / "bootstrap.py"
+ADD_SYMLINKS = REPO_ROOT / "add_symlinks.py"
 
 
-class BootstrapCliTests(unittest.TestCase):
+class AddSymlinksCliTests(unittest.TestCase):
     def test_apply_installs_pi_and_shared_skill_links(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
-            result = self.run_bootstrap(home)
+            result = self.run_script(home)
 
             self.assertEqual(result.returncode, 0, result.stderr)
             expected_links = {
@@ -29,6 +29,19 @@ class BootstrapCliTests(unittest.TestCase):
                     self.assertTrue(target.is_symlink())
                     self.assertEqual(target.resolve(), source.resolve())
 
+    def test_apply_leaves_existing_pi_settings_unchanged(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            target = home / ".pi/agent/settings.json"
+            target.parent.mkdir(parents=True)
+            original = '{\n  "theme": "device-specific"\n}\n'
+            target.write_text(original)
+
+            result = self.run_script(home)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(target.read_text(), original)
+
     def test_apply_replaces_stale_symlinks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
@@ -36,7 +49,7 @@ class BootstrapCliTests(unittest.TestCase):
             target.parent.mkdir(parents=True)
             target.symlink_to(home / "old-configuration")
 
-            result = self.run_bootstrap(home)
+            result = self.run_script(home)
 
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertTrue(target.is_symlink())
@@ -59,7 +72,7 @@ class BootstrapCliTests(unittest.TestCase):
                     target.mkdir()
                     (target / "keep-me").write_text("keep me")
 
-                result = self.run_bootstrap(home)
+                result = self.run_script(home)
 
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("refusing to replace non-symlink", result.stderr)
@@ -69,11 +82,11 @@ class BootstrapCliTests(unittest.TestCase):
                 else:
                     self.assertEqual((target / "keep-me").read_text(), "keep me")
 
-    def run_bootstrap(self, home: Path) -> subprocess.CompletedProcess[str]:
+    def run_script(self, home: Path) -> subprocess.CompletedProcess[str]:
         environment = os.environ.copy()
         environment["HOME"] = str(home)
         return subprocess.run(
-            [sys.executable, str(BOOTSTRAP), "apply"],
+            [sys.executable, str(ADD_SYMLINKS), "apply"],
             cwd=REPO_ROOT,
             env=environment,
             capture_output=True,

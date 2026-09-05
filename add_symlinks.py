@@ -48,7 +48,7 @@ def apply(home: Path) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Install jpstack configuration")
+    parser = argparse.ArgumentParser(description="Add jpstack configuration symlinks")
     parser.add_argument("command", choices=("apply",))
     args = parser.parse_args()
 

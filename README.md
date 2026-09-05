@@ -1,53 +1,34 @@
-## Agentic coding setup
+# Agentic coding setup
 
-### Prompts
+## Add symlinks
 
-Symlink `AGENTS.md` and `APPEND_SYSTEM.md` to inside `~/.pi/agent/`
+Run from the repository root:
 
-### Pi Extensions
-
-Symlink each extension directory in `extensions` to `~/.pi/agent/extensions`
-
-### Skills
-
-Symlink each skill directory in `skills` to agent skills directories - e.g. `~/.pi/agent/skills`
-
-### Sandbox
-
-https://github.com/nolabs-ai/nono
-
-Nono sandbox
-
-`~/.config/nono/profiles/pi-mise.json`
-
-```json
-{
-  "extends": [
-    "pi"
-  ],
-  "meta": {
-    "name": "pi-mise",
-    "version": "",
-    "description": "Pi sandbox with a mise-managed Node runtime",
-    "author": null
-  },
-  "filesystem": {
-    "allow": [
-      "$WORKDIR",
-      "$HOME/.pi",
-      "$HOME/code/agents",
-      "~/.pi-lens"
-    ],
-    "read": [
-      "$HOME/.local/share/mise/installs/node",
-      "~/.worktrees",
-      "~/code"
-    ],
-}
-
+```shell
+python3 add_symlinks.py apply
 ```
 
-`~/.zshrc`
+The script manages these symlinks:
+
+- `pi-agent/AGENTS.md` to `~/.pi/agent/AGENTS.md`
+- `pi-agent/APPEND_SYSTEM.md` to `~/.pi/agent/APPEND_SYSTEM.md`
+- Each directory in `pi-extensions/` to `~/.pi/agent/extensions/`
+- `skills/` to `~/.agents/skills`
+
+It leaves `~/.pi/agent/settings.json` unchanged. It replaces stale symlinks but refuses to replace regular files or directories.
+
+## Sandbox
+
+Install [Nono](https://github.com/nolabs-ai/nono), then install or update the tracked profile through Nono's draft workflow:
+
+```shell
+mkdir -p ~/.config/nono/profile-drafts
+cp nono/pi-mise.json ~/.config/nono/profile-drafts/pi-mise.json
+nono profile validate --draft pi-mise
+nono profile promote pi-mise
+```
+
+Add the Pi wrapper to `~/.zshrc`:
 
 ```shell
 pi() {
