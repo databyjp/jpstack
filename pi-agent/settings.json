@@ -1,7 +1,4 @@
 {
-  "lastChangelogVersion": "0.85.1",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.6-sol",
   "packages": [
     "npm:@agnishc/edb-session-manager",
     "npm:@plannotator/pi-extension",
@@ -12,11 +9,11 @@
     "npm:@juicesharp/rpiv-todo",
     "npm:pi-lens",
     "npm:pi-calm",
-    "npm:@henryqw/pi-notes",
     "npm:@narumitw/pi-worktree",
     {
       "source": "/Users/jphwang/.config/nono/packages/nolabs-ai/pi"
-    }
+    },
+    "npm:pi-langfuse"
   ],
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,

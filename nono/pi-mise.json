@@ -27,28 +27,26 @@
   },
   "filesystem": {
     "allow": [
-      "$WORKDIR",
-      "$HOME/.pi",
-      "$HOME/code/agents",
-      "~/.pi-lens",
-      "~/.plannotator"
+      "$HOME/.pi-lens",
+      "$HOME/.plannotator/drafts",
+      "$HOME/.worktrees/",
+      "$HOME/.plannotator/feedback"
     ],
     "read": [
       "$HOME/.local/share/mise/installs/node",
       "$HOME/.local/share/mise/installs/python",
-      "~/.worktrees",
-      "~/code",
-      "~/.claude"
-    ],
-    "write": [
-      "~/.plannotator/feedback"
+      "$HOME/code",
+      "$HOME/.worktrees",
+      "$HOME/.claude"
     ],
     "allow_file": [
-      "~/.plannotator/config.json"
+      "$HOME/.plannotator/config.json"
     ],
     "read_file": [],
     "write_file": [],
-    "unix_socket": [],
+    "unix_socket": [
+      "$HOME/.colima/default/docker.sock"
+    ],
     "unix_socket_bind": [],
     "unix_socket_dir": [],
     "unix_socket_dir_bind": [],
@@ -73,6 +71,11 @@
     "tls_intercept": null,
     "upstream_proxy": null,
     "upstream_bypass": []
+  },
+  "environment": {
+    "set_vars": {
+      "DOCKER_HOST": "unix:///Users/jphwang/.colima/default/docker.sock"
+    }
   },
   "diagnostics": {
     "suppress_system_services": []
