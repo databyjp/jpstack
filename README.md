@@ -39,3 +39,34 @@ yolopi() {
     "$PI_BIN" "$@"
 }
 ```
+
+To enable agents to use Docker, install Colima, and then set up its own profile; separate to my own .docker
+
+1. Create the Docker client directory
+
+Run outside the sandbox:
+
+```bash
+CLIENT="$HOME/.local/share/nono-docker-client"
+
+mkdir -p "$CLIENT/cli-plugins" "$CLIENT/buildx"
+printf '{}\n' > "$CLIENT/config.json"
+
+ln -sfn \
+/Applications/Docker.app/Contents/Resources/cli-plugins/docker-buildx \
+"$CLIENT/cli-plugins/docker-buildx"
+
+ln -sfn \
+/Applications/Docker.app/Contents/Resources/cli-plugins/docker-compose \
+"$CLIENT/cli-plugins/docker-compose"
+ ```
+
+This supplies Buildx and Compose without exposing ~/.docker or its
+registry credentials.
+
+Verify:
+
+```bash
+DOCKER_CONFIG="$CLIENT" docker buildx version
+DOCKER_CONFIG="$CLIENT" docker compose version
+```
