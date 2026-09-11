@@ -31,13 +31,15 @@ Neither records the session that produced the code.
   sentence is technically accurate.
 
 * **Document information the signature does not convey.** Include important
-  side effects, failure modes, mutation, ownership, ordering, units, invariants,
-  lifecycle behavior, or environmental requirements when they matter to callers
-  or maintainers.
+  parameter interpretation and use, such as a path's resolution base or a label
+  used in diagnostics. Also include return guarantees, side effects, failure
+  modes, mutation, ownership, ordering, units, invariants, lifecycle behavior,
+  or environmental requirements when they matter to callers or maintainers.
 
-* **Do not narrate the signature.** Parameter, return, and exception sections are
-  useful when they add information, not merely because those things exist.
-  Avoid descriptions such as "cutoff: The cutoff" or "Returns the result."
+* **Use sections for contract details.** Use an `Args` section when several
+  parameters need semantic explanation. Use `Returns`, `Raises`, or `Attributes`
+  when those contracts need to be found independently. Each entry should add
+  information beyond the name and annotation.
 
 * **Docstrings are not logs.** Do not write about rejected alternatives or
   historical solutions. "Plain strings rather than an enum," "returned rather
@@ -120,34 +122,18 @@ def _validate_arm_parity(...):
 
 Trivial private helpers need not receive docstrings merely for consistency.
 
-### A contract that needs more than a summary
+### Parameters with semantic roles
 
 ```python
-def expire_sessions(cutoff):
-    """Expire sessions last active before ``cutoff``.
-
-    Expiration is permanent and invalidates outstanding refresh tokens.
-    """
-```
-
-This is preferable to:
-
-```python
-def expire_sessions(cutoff):
-    """Expire sessions."""
-```
-
-and to boilerplate that adds no information:
-
-```python
-def expire_sessions(cutoff):
-    """Expire sessions.
+def resolve_path(declaring_file: Path, declared_path: str | Path) -> Path:
+    """Resolve a declared path relative to the file that contains it.
 
     Args:
-        cutoff: The cutoff.
+        declaring_file: File whose parent is the base for relative paths.
+        declared_path: Path as declared, before expansion and resolution.
 
     Returns:
-        The result.
+        The resolved absolute path.
     """
 ```
 
@@ -162,4 +148,5 @@ for listener in list(self._listeners):
 The comment records a constraint that is not obvious from the code. Do not
 replace it with `# Iterate over listeners`.
 
-The goal is high information density: enough docume
+The goal is high information density: each sentence should add context needed
+to use or maintain the code.
