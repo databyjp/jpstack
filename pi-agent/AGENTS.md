@@ -36,3 +36,40 @@ a distinct reader need or maintenance responsibility. Do not split based on leng
 
 - Before changing architecture, read relevant records under `architecture/adr/` when that directory exists.
 - When a decision is hard to reverse, surprising without context, and based on a real trade-off, use the `domain-modeling` skill to offer an ADR. Do not record routine or easily reversible choices.
+
+## Code style
+
+### Name parameters by semantic role
+
+Prefer parameter names that state each value's role at the interface. A caller should be able to understand a keyword argument without
+opening the callee. Distinguish categories from instances, declaring files from authored or resolved paths, and classes from instances.
+
+Rather than:
+
+```python
+def load_resource(
+    *,
+    resource: str,
+    source: Path,
+    reference: Path,
+    model: type[BaseModel],
+) -> BaseModel: ...
+```
+
+Prefer:
+
+```python
+def load_resource(
+    *,
+    resource_kind: str,             # "AgentConfig", not a resource instance
+    declaring_file: Path,           # file containing the reference
+    declared_resource_path: Path,   # path as authored, before resolution
+    model_type: type[BaseModel],     # class used to validate the file
+) -> BaseModel: ...
+```
+
+Use the same terminology across producer parameters, exception attributes, and serialized output. Treat JSON field names as public
+interfaces.
+
+Do not make names longer when the callable and type already establish the role. For example, load_experiment(path: Path) is clearer than
+repeating load_experiment(experiment_path: Path).
