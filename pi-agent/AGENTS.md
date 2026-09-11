@@ -8,18 +8,29 @@
 
 ## Documentation
 
-Keep repository documentation accurate and durable for humans and agents.
+Keep documentation accurate, durable, and easy to navigate for humans and agents.
 
-- Prefer progressive disclosure. Use `README.md` as a concise entry point and move specialized or implementation-specific material
-into focused documents.
-- State supported behavior directly. Use "currently" only when contrasting versions or describing a temporary state.
-- Use "not yet" only for committed roadmap work. Do not imply that an absent capability is planned.
-- Describe positive workflows where readers perform them.
-- Document an unsupported capability only when readers would reasonably expect it or when the boundary affects correct use.
-- Keep each capability boundary in one authoritative location. Link to it instead of repeating absence lists.
-- Base behavioral claims on implemented behavior verified in source or tests. Do not document planned behavior as available.
-- Review documentation when a change affects a public API, supported workflow or command, validation rule, documented module
-responsibility, or capability boundary. Behavior-preserving internal changes do not require documentation edits.
+### Content
+
+- Document implemented behavior and support behavioral claims with source or tests.
+- State behavior directly. Use "currently" only for version contrasts or temporary states, and "not yet" only for committed roadmap
+work.
+- Document workflows where readers perform them. Mention unsupported behavior only when readers would reasonably expect it or when it
+affects correct use.
+- Keep each capability boundary authoritative in one place and link to it elsewhere.
+- Review documentation when a change affects a public interface, workflow, command, validation rule, documented module responsibility,
+or capability boundary. Behavior-preserving internal changes do not require documentation edits.
+
+### Structure
+
+- Use `README.md` to explain the repository's purpose, provide useful starting points, and route readers to deeper material.
+- Organize around reader tasks by default. Use personas when their workflows materially differ, and stable domain areas when they
+provide clearer reference or maintainer navigation.
+- Apply progressive disclosure within each path: put prerequisites and common workflows first, then optional context, implementation
+detail, and rationale. Keep linked pages understandable when opened directly.
+- Use Diátaxis to clarify a page's purpose, not as a required directory structure.
+- Prefer deep guides over clusters of shallow pages. Extend a guide when material serves the same audience and task; create a page for
+a distinct reader need or maintenance responsibility. Do not split based on length alone.
 
 ## Durable decisions
 
