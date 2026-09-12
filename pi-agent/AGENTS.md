@@ -5,6 +5,7 @@
 - When no language is specified and the repository does not imply one, prefer Python.
 - Ask before choosing a language when the choice materially affects deployment, runtime constraints, interoperability, or maintenance.
 - Project-level instructions override these defaults.
+- When presenting outcomes of tasks, look to reduce the required cognitive load. When it relates to coding tasks, strongly consider using the `/show-me` skill to reduce the reader's cognitive load.
 
 ## Documentation
 
