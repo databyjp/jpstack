@@ -29,9 +29,9 @@ State the recommended lane. When uncertain, use Gated.
 5. Implement, validate, report the evidence, and stop.
 6. Record durable decisions, then propose the next checkpoint.
 
-Ask first when a choice affects user-visible behavior, an irreversible schema or
-public interface, security, privacy, destructive action, meaningful cost, or
-most of the proposed change. Otherwise state a reversible assumption.
+If implementation exposes a choice not already settled by the approved contract, ask first when it affects user-visible behavior, a persisted schema or public interface, introduces a significant dependency or architectural seam, affects security, privacy, destructive action, or meaningful cost, would materially constrain later retained work or make rejecting the choice require substantial rework, or affects most of the proposed change.
+
+Otherwise make and record an assumption that is cheap to reject at the next review: it creates no external effects, does not materially constrain later work, and can be discarded without substantial rework. Git reversibility alone does not satisfy this test.
 
 A decision packet contains the decision, recommendation, main trade-off, and one
 question. Ask the user for concrete choices without repeating settled background.
@@ -113,7 +113,7 @@ Present this compact contract for approval:
 - **Validation:** one primary command or observation
 - **Expected files:** closed list
 - **Do not implement:** named adjacent and downstream behavior
-- **Stop when:** evidence passes, fails, or scope must materially expand
+- **Stop when**: evidence passes, fails, scope must materially expand, or an unresolved choice crosses the ask-first boundary
 - **Disposition:** retain, or discard with a concrete reason retained code would
   cost more or weaken the evidence
 - **Review target:** approximate size of normally formatted maintained code;
@@ -122,9 +122,11 @@ Present this compact contract for approval:
 The expected-file list constrains scope, not project structure. Include ordinary
 configuration, dependency, source, and test files when retained code needs them.
 The review target estimates cognitive load after the checkpoint passes the split
-test. Prefer roughly 20-50 changed lines for a disposable spike and 100-200 for
-uncertain retained work, but size varies with language and scaffolding. The target is not
-a quota. Do not compress formatting or choose a less suitable implementation to
+test.
+
+For a disposable spike, prefer the smallest experiment that answers its one question. For uncertain retained work, roughly 100–200 changed lines is a useful review target, but size varies with language and scaffolding. The target is not a quota.
+
+Do not compress formatting or choose a less suitable implementation to
 meet it. A modest overrun does not require approval. Stop when growth introduces
 a new responsibility, independently rejectable behavior, unexpected file
 category, or materially larger review surface.
@@ -142,8 +144,7 @@ Restate the approved contract, then:
 5. Map every changed file to the primary assertion. Revert unrelated changes.
 6. Classify each approved constraint as passed, failed, or deferred. Confirm that
    every `Do not implement` item remains absent.
-7. Report the evidence and stop. Do not inspect, design, or implement another
-   checkpoint in the same turn.
+7. Report the evidence and stop. You may identify the likely next checkpoint from evidence already gathered, but do not investigate, design, or implement it before review.
 
 ## Split example
 
