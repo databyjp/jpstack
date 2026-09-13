@@ -1,3 +1,9 @@
+# Language
+
+For producing any non-trivial length of prose, use the `unslop` skill.
+
+Prefer precise, established technical terminology over ambiguous shorthand. For example, prefer "CLI boundary" or "entrypoint orchestration," rather than broad phrases such as "process concerns." If no standard term fits, describe the mechanism directly.
+
 # Development preferences
 
 - Follow the existing project's language, package manager, and conventions.
