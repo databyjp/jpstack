@@ -1,8 +1,8 @@
 ---
 name: docstrings
 description: >-
-  Use when writing or reviewing code, and whenever
-  writing or editing docstrings and comments.
+  Use when writing or reviewing non-trivial docstrings or comments,
+  or when code-documentation quality is a material part of the task.
 ---
 
 # Docstrings
@@ -17,8 +17,9 @@ Neither records the session that produced the code.
 
 * **Docstrings MUST give the reader an entry point and reduce cognitive load.**
   Prefer a descriptive docstring for modules, types, and meaningful callables.
-  State what the symbol does and enough of its role, behavior, or contract that
-  the reader can understand its purpose before reading the implementation.
+  Orient the reader to the symbol's purpose and add important role, behavior,
+  or contract information that is not apparent from its name, signature,
+  types, and surrounding structure.
 
 * **Be complete, then concise.** Use as much documentation as the symbol
   warrants, but no more. Reserve one-line docstrings for genuinely simple
