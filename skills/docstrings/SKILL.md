@@ -9,7 +9,9 @@ description: >-
 
 A docstring gives the reader context for a module, type, or callable and describes its role or contract.
 
-A comment explains local behavior or constraints that the code cannot make clear.
+A comment gives readers the abstraction, rationale, dependency, or constraint
+needed to understand or safely change nearby code when that information is not
+obvious from the implementation or would be costly to infer.
 
 Neither records the session that produced the code.
 
@@ -42,15 +44,18 @@ Neither records the session that produced the code.
   when those contracts need to be found independently. Each entry should add
   information beyond the name and annotation.
 
-* **Docstrings are not logs.** Do not write about rejected alternatives or
-  historical solutions. "Plain strings rather than an enum," "returned rather
-  than printed," or "now returns a list instead of a dict" is usually irrelevant
-  to a reader. What changed belongs in the commit.
+* **Docstrings and comments are not logs.** Do not preserve development
+  chronology or describe changes from historical implementations. Document
+  durable rationale when it explains why an obvious alternative would violate
+  a constraint. Put change history in commits and broader architectural
+  trade-offs in an ADR.
 
-* **Comments explain local reasons.** A comment such as "Copy before iterating
-  because callbacks may remove listeners" records a constraint needed to modify
-  the code safely. Prefer explaining why a surprising implementation detail is
-  necessary over describing what the next line does.
+* **Comments explain non-obvious information.** Use them for block-level intent
+  in long operations, design rationale, invariants, edge cases, dependencies,
+  and local constraints. A comment such as "Copy before iterating because
+  callbacks may remove listeners" records a constraint needed to modify the
+  code safely. Prefer the abstraction or reason over a paraphrase of the next
+  line.
 
 * **Cut context the reader cannot reach.** Stack layer numbers, ticket IDs,
   sprint names, "as discussed above," and "as requested" do not belong in the

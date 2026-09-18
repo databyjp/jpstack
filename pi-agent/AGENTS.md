@@ -50,10 +50,10 @@ a distinct reader need or maintenance responsibility. Do not split based on leng
 
 Optimize for understanding at the point of use, not minimum line count or documentation coverage.
 
-* Prefer clear names, types, and structure. Comments and docstrings add context the code cannot express, such as purpose, constraints, lifecycle, side effects, or external requirements; do not narrate code or document trivial callables.
-* Make orchestration read top-down. Extract coherent operations, contracts, or repeated mechanics—not merely to shorten a function—and avoid pass-through helpers that increase navigation.
-* State shared operating context and non-obvious contracts once at the narrowest useful scope.
-* Keep behavior-specific inputs, decisions, and expected results close to where they matter. Extract repeated mechanics when doing so removes noise without hiding the behavior.
+- Prefer clear names, types, and structure. Comments and docstrings should record information that is not obvious from the code or would be costly to infer, such as purpose, constraints, lifecycle, side effects, rationale, or external requirements. Do not paraphrase the code or document trivial callables.
+- Make orchestration read top-down. Extract coherent operations, contracts, or repeated mechanics—not merely to shorten a function—and avoid pass-through helpers that increase navigation.
+- State shared operating context and non-obvious contracts once at the narrowest useful scope.
+- Keep behavior-specific inputs, decisions, and expected results close to where they matter. Extract repeated mechanics when doing so removes noise without hiding the behavior.
 
 In tests, favor local readability over deduplication when abstraction would separate a scenario from the data needed to understand its assertions.
 
