@@ -1,6 +1,6 @@
 # Language
 
-For producing any non-trivial length of prose, use the `unslop` skill.
+Use the `unslop` skill when producing any non-trivial length of prose.
 
 Prefer precise, established technical terminology over ambiguous shorthand. For example, prefer "CLI boundary" or "entrypoint orchestration," rather than broad phrases such as "process concerns." If no standard term fits, describe the mechanism directly.
 
@@ -11,7 +11,7 @@ Prefer precise, established technical terminology over ambiguous shorthand. For 
 - When no language is specified and the repository does not imply one, prefer Python.
 - Ask before choosing a language when the choice materially affects deployment, runtime constraints, interoperability, or maintenance.
 - Project-level instructions override these defaults.
-- When presenting outcomes of tasks, look to reduce the required cognitive load. When it relates to coding tasks, strongly consider using the `/show-me` skill to reduce the reader's cognitive load.
+- Reduce the cognitive load of task reports. For coding tasks, strongly consider using the `/show-me` skill.
 
 ## Project documentation
 
@@ -50,17 +50,18 @@ a distinct reader need or maintenance responsibility. Do not split based on leng
 
 Optimize for understanding at the point of use, not minimum line count or documentation coverage.
 
-- Prefer clear names, types, and structure. Comments and docstrings should record information that is not obvious from the code or would be costly to infer, such as purpose, constraints, lifecycle, side effects, rationale, or external requirements. Do not paraphrase the code or document trivial callables.
+- Prefer clear names, types, and structure. Treat documentation attached to externally visible declarations as part of the interface. Cover every externally visible module, type, and callable at its declaration or the narrowest enclosing externally visible scope. Ensure callers can understand the abstraction and use it correctly without reading its implementation.
+- Write comments and docstrings at a different level from the code. Add higher-level abstraction or rationale, or lower-level semantic precision. Do not paraphrase declarations or implementation.
+- Use implementation comments for rationale, invariants, dependencies, and constraints needed to change nearby code safely. Keep them near the code they explain.
 - Make orchestration read top-down. Extract coherent operations, contracts, or repeated mechanics—not merely to shorten a function—and avoid pass-through helpers that increase navigation.
-- State shared operating context and non-obvious contracts once at the narrowest useful scope.
 - Keep behavior-specific inputs, decisions, and expected results close to where they matter. Extract repeated mechanics when doing so removes noise without hiding the behavior.
 
 In tests, favor local readability over deduplication when abstraction would separate a scenario from the data needed to understand its assertions.
 
 ### Name parameters by semantic role
 
-Prefer parameter names that state each value's role at the interface. A caller should be able to understand a keyword argument without
-opening the callee. Distinguish categories from instances, declaring files from authored or resolved paths, and classes from instances.
+Prefer parameter names that state each value's role at the interface. Make each keyword argument understandable without opening the
+callee. Distinguish categories from instances, declaring files from authored or resolved paths, and classes from instances.
 
 Rather than:
 

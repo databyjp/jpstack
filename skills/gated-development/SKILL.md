@@ -81,11 +81,10 @@ Split independently rejectable behavior. Defer generalization, variants,
 standalone documentation, migration, cleanup, and hardening unless the primary
 assertion requires them.
 
-Docstrings and comments needed to understand or safely change retained code are
-part of the implementation, not deferred documentation. Prefer clear names and
-types; use the `docstrings` skill for information that is not obvious or would
-be costly to infer, including contracts, rationale, dependencies, and local
-constraints.
+Interface documentation and comments needed to understand or safely change
+retained code are part of the implementation, not deferred documentation.
+Prefer clear names and types; use the `code-documentation` skill for interface
+contracts, rationale, dependencies, and local constraints.
 
 Checkpoint kinds describe the change, not the implementation. Name retained
 modules, interfaces, and directories by their capability, not `Probe` or another

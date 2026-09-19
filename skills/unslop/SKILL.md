@@ -10,6 +10,7 @@ Revise the draft without changing its facts, intent, technical meaning, required
 ## Revision pass
 
 - Start with the answer or necessary context. Delete openings such as "Of course!", "Great question!", and "You're absolutely right!"
+- Phrase actionable instructions as imperatives. Use declarative sentences for definitions, facts, and rationale. Replace "Comments are not records of the development session" with "Do not use comments to record the development session."
 - Cut sentences that do not help the reader act or understand. Delete "It is important to note that." Replace "In order to" with "To" and "due to the fact that" with "because."
 - Replace praise and mood with facts. Rewrite "This pivotal release showcases the team's groundbreaking work" to name the release, the change, and who made it.
 - Name mechanisms and measurements. Replace "SQL you can read" with "`.toSQL()` returns the exact string sent to the database." Replace "performance improved significantly" with the measured change.
