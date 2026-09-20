@@ -11,33 +11,43 @@ description: >-
 Documentation attached to a declaration is part of the module's interface.
 Implementation comments help maintainers understand and safely change the code.
 
-## Rules
+## Interface documentation
 
-* **Cover every external interface.** Document each externally visible module,
-  type, and callable at its declaration or the narrowest enclosing externally
-  visible scope. Ensure callers can understand the abstraction and use it
-  correctly without reading the implementation.
+* **Document every external interface.** Document each externally visible
+  module, type, and callable at its declaration or the narrowest enclosing
+  externally visible scope.
 
-* **Write at a different level from the code.** Use higher-level documentation
-  to explain purpose, responsibility, mental model, or rationale. Use
-  lower-level documentation to add precision about exact semantics. Remove
-  comments that repeat the code at the same level.
+* **Explain the abstraction and caller-visible contract.** Describe the purpose,
+  responsibility, or mental model and when to use it. Include relevant input
+  semantics, guarantees, side effects, failure modes, mutation, ownership,
+  ordering, units, invariants, lifecycle, environmental requirements, and
+  performance characteristics.
+
+* **Make interface documentation self-contained.** Ensure callers can understand
+  and use the abstraction without reading its implementation. Describe
+  observable behavior, not internal control flow or strategy.
+
+## Implementation comments
+
+* **Explain non-obvious implementation decisions.** Add a local comment when
+  changing the code safely requires information the code does not make clear,
+  such as rationale, an invariant, a dependency, or an edge case. Do not
+  narrate the implementation or repeat the interface contract.
+
+* **Document meaningful internal declarations.** Document private modules,
+  types, or callables when their abstraction, contract, or invariant would
+  otherwise be costly to infer.
+
+## Rules for both
+
+* **Write at a different level from the code.** Add higher-level abstraction or
+  rationale, or lower-level precision about exact semantics. Remove comments
+  that repeat the code at the same level.
 
 * **Improve declarations before compensating with prose.** Use clear names,
   precise types, and cohesive interfaces where the language permits. Use
   documentation to supplement strong declarations, not excuse vague names or
   unstructured values.
-
-* **Document the caller-visible contract.** Include relevant parameter
-  interpretation, guarantees, side effects, failure modes, mutation, ownership,
-  ordering, units, invariants, lifecycle, environmental requirements, and
-  performance characteristics. Describe observable behavior, not internal
-  control flow.
-
-* **Document implementation constraints locally.** Use implementation comments
-  for rationale, dependencies, invariants, edge cases, and constraints needed
-  to change nearby code safely. Document private declarations when their
-  abstraction, contract, or invariant would otherwise be costly to infer.
 
 * **Be complete, then concise.** Use a one-line docstring only when it
   completely states the useful contract. Use `Args`, `Returns`, `Raises`, or

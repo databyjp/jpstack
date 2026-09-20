@@ -50,9 +50,10 @@ a distinct reader need or maintenance responsibility. Do not split based on leng
 
 Optimize for understanding at the point of use, not minimum line count or documentation coverage.
 
-- Prefer clear names, types, and structure. Treat documentation attached to externally visible declarations as part of the interface. Cover every externally visible module, type, and callable at its declaration or the narrowest enclosing externally visible scope. Ensure callers can understand the abstraction and use it correctly without reading its implementation.
+- Prefer clear names, types, and structure. Treat documentation attached to externally visible declarations as part of the interface.
+- Give interface documentation priority over implementation comments. Cover every externally visible module, type, and callable at its declaration or the narrowest enclosing externally visible scope. Explain the abstraction and caller-visible contract completely enough that callers do not need to read the implementation.
+- Use implementation comments to explain internal strategy, rationale, invariants, dependencies, and constraints needed to change the code safely. Keep them near the code they explain. Do not put implementation details in interface documentation or repeat the interface contract inside the implementation.
 - Write comments and docstrings at a different level from the code. Add higher-level abstraction or rationale, or lower-level semantic precision. Do not paraphrase declarations or implementation.
-- Use implementation comments for rationale, invariants, dependencies, and constraints needed to change nearby code safely. Keep them near the code they explain.
 - Make orchestration read top-down. Extract coherent operations, contracts, or repeated mechanics—not merely to shorten a function—and avoid pass-through helpers that increase navigation.
 - Keep behavior-specific inputs, decisions, and expected results close to where they matter. Extract repeated mechanics when doing so removes noise without hiding the behavior.
 
