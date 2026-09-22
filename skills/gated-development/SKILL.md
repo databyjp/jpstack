@@ -62,6 +62,34 @@ non-goals remain fixed. Revise the affected contract with approval when the
 change crosses an ask-first boundary. Do not carry approval into an adjacent
 Product outcome.
 
+## Select verification evidence
+
+For each must-have behavior, choose the cheapest existing executable check whose
+observations fully support the claim. Cost includes runtime, external effects,
+human judgment, and maintenance. Prefer a compiler or static check for a source
+invariant, a unit test for isolated behavior, an integration or acceptance test
+for interactions it actually exercises, and the built product entrypoint when
+the claim depends on packaging, process I/O, persistence, or external systems.
+Do not require a higher-level run merely because behavior is user-visible when a
+lower-level check establishes the same observations.
+
+Treat a check as partial evidence when it bypasses behavior named in the Product
+contract. Name the uncovered behavior, such as entrypoint wiring, artifact
+identity, lifecycle, side effects, or retained state. Add only the smallest check
+that closes that gap. Several checks may cover different must-have behaviors;
+one broad product run does not compensate for an unobserved behavior.
+
+Use a one-off command or observation for a non-recurring operational check.
+Create reusable verification support only when repeated checks depend on
+operational knowledge that ordinary tests or commands do not safely capture,
+such as exact instance or artifact selection, external infrastructure,
+readiness, credentials, retained evidence, stale-state detection, or cleanup. Do
+not create a verification skill merely to wrap an existing test suite.
+
+Keep external actions within the Product contract's ask-first boundaries. Revise
+the approved validation surface when evidence reveals a gap, but do not create a
+new task unless the Product outcome or non-goals change.
+
 ## One-checkpoint rule
 
 A checkpoint has one primary executable assertion. It may contribute only part

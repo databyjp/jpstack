@@ -90,6 +90,50 @@
         "Remote upload requires a new Product contract rather than inheriting the current approval.",
         "The current task can revise its checkpoint or validation contract without redefining its Product outcome."
       ]
+    },
+    {
+      "id": "reuse-sufficient-acceptance-test",
+      "prompt": "The approved Product outcome is that `tool export --format json` emits valid JSON on stdout. The repository already has an acceptance test that installs the built wheel, invokes that exact command in a subprocess, parses stdout, and asserts stderr is empty. Choose the validation approach and say whether to add a product verifier skill.",
+      "expected_output": "Uses the existing acceptance test because it exercises the requested entrypoint and observations, without adding a redundant verifier skill or manual product run.",
+      "assertions": [
+        "The existing acceptance test is selected as Product evidence because it covers the built artifact, CLI entrypoint, stdout parsing, and stderr behavior.",
+        "The response does not require a separate manual invocation merely because the outcome is user-visible.",
+        "The response does not propose a verification skill that wraps the existing test.",
+        "Any remaining gap is tied to a specific must-have behavior rather than a preference for higher-level testing."
+      ]
+    },
+    {
+      "id": "reject-insufficient-proxy-surface",
+      "prompt": "The approved Product outcome is that a user can run `tool export --format json` from the installed package and receive valid JSON on stdout. Available checks are a serializer unit test and a parser test that calls the CLI callback directly. Choose the validation approach and identify any missing evidence.",
+      "expected_output": "Keeps the lower-level checks as partial evidence and adds the smallest executable check through the installed CLI rather than treating proxies as sufficient.",
+      "assertions": [
+        "The serializer and callback tests are classified as partial evidence.",
+        "The missing evidence includes installed entrypoint wiring and process-level stdout behavior.",
+        "The proposed validation invokes the installed CLI and parses its stdout.",
+        "The response adds only the check needed to close the named evidence gap."
+      ]
+    },
+    {
+      "id": "prefer-one-off-operational-check",
+      "prompt": "The approved Product outcome includes a one-time migration of the staging account: all 317 records must retain their external IDs after the migration. The migration will not become a recurring workflow. Unit tests cover the transform, but only a pre/post query against staging can establish this must-have behavior. Choose the validation approach and say whether to create a verification skill.",
+      "expected_output": "Uses a bounded one-off pre/post staging check with retained results, subject to approval for the external action, and does not create a reusable skill for a non-recurring workflow.",
+      "assertions": [
+        "The response selects a pre/post staging query because unit tests cannot establish retained staging state.",
+        "The external migration and staging access remain ask-first actions.",
+        "The result records the 317-record count and external-ID comparison as evidence.",
+        "The response rejects a reusable verification skill because the workflow is one-time and has no recurring operational contract."
+      ]
+    },
+    {
+      "id": "create-reusable-operational-verifier",
+      "prompt": "Every desktop release must verify the packaged app rather than a stale developer process. Verification repeatedly requires locating the new package, stopping only the process started by the check, launching that exact package, waiting for its readiness signal, driving one save-and-reopen action, retaining logs, and cleaning up its temporary profile. Existing unit and integration tests do not manage those lifecycle steps. Choose the validation approach.",
+      "expected_output": "Proposes reusable product-verification support because recurring instance selection, lifecycle management, readiness, retained evidence, and cleanup are operational knowledge not covered by existing tests.",
+      "assertions": [
+        "The response identifies the workflow as recurring rather than a one-off check.",
+        "The proposed verifier identifies and launches the exact packaged artifact instead of accepting any running instance.",
+        "Readiness, the save-and-reopen observation, retained logs, and cleanup are explicit parts of the verification contract.",
+        "The response justifies reusable verification support by the operational lifecycle knowledge, not merely because the behavior is user-visible."
+      ]
     }
   ]
 }

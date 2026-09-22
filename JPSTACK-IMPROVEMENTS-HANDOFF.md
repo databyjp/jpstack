@@ -2,7 +2,7 @@
 
 ## Status
 
-Planning only. No workflow or extension changes have been implemented from this discussion.
+The Product contract, task-boundary rule, and evidence mapping were implemented in commit `79b55c3`. The remaining phases are proposals and should be implemented as separate executable checkpoints.
 
 This handoff proposes independently testable improvements to `jpstack`. The main goal is to reduce low-value human supervision by moving decisions to the start of a task, grouping related decisions, and allowing bounded execution between human reviews. It does not propose a broad autonomous orchestrator or a sticky workflow router.
 
@@ -53,104 +53,48 @@ Preserve these jpstack properties:
 
 ## Pstack-inspired changes
 
-Implement and evaluate these changes one at a time. Each step should remain useful if later steps are rejected.
+The five phases below organize the work. They do not permit combining implementation checkpoints. Complete and evaluate each named checkpoint before starting the next one.
 
-### 1. Strengthen task completion and task boundaries
+### 1. Keep the completed Product contract as the foundation
 
-**Purpose:** Define explicit task-level completion and stopping semantics before automating continuation.
+Commit `79b55c3` added one Product-contract approval containing the outcome, non-goals, must-have behaviors, exit predicate, and validation surface. It also requires evidence for every must-have behavior before claiming Product completion and starts a new task only when the outcome or non-goals materially change.
 
-Update `skills/gated-development/SKILL.md` so one Product-contract approval includes:
+Keep the existing per-checkpoint approval flow while the remaining policy changes are evaluated.
 
-- one Product outcome,
-- explicit non-goals,
-- an approved must-have behavior checklist,
-- a checkable exit predicate,
-- the intended validation surface.
+### 2. Design and evaluate bounded mode
 
-Do not claim Product completion unless the exit predicate passes and every must-have behavior has current evidence from the approved validation surface. Suggestions and optional follow-ups do not block completion unless the Product contract includes them as must-have behavior.
+**Purpose:** Replace serial continuation approvals with one structured approval for eligible long-running work.
 
-Add a task-boundary rule. Start a new task only when the Product outcome or non-goals materially change. A changed checkpoint, implementation path, or validation method remains in the same task while its outcome and non-goals remain fixed. Do not carry approval into an adjacent Product outcome.
+Implement this phase as four separate checkpoints:
 
-Add sanitized evaluation cases based on the audit:
+1. Add a verification-selection rule to `gated-development`. The agent should choose the cheapest existing executable surface that establishes each must-have behavior. It should not prefer product execution when static or unit evidence fully establishes the behavior, and it should not create a verification skill that merely wraps an existing test suite.
+2. Perform the focused S09 case study described below. Convert its routine approvals, necessary decisions, scope corrections, and verification corrections into sanitized fixtures.
+3. Add a minimal Pi SDK or RPC evaluation runner for baseline-versus-candidate skill comparisons. Store transcripts, tool calls, duration, usage, and assertion results. Use deterministic checks where possible and blinded human review for semantic judgments. Do not add a model judge yet.
+4. Add an opt-in `Bounded` mode while retaining `Supervised` mode. The agent recommends a mode, and the human approves `Bounded` once through a packet containing the Product contract, allowed scope, permitted actions, verification plan, ask-first conditions, external-effect permissions, and retry and no-progress budgets.
 
-- Product framing omits the must-have checklist, exit predicate, or validation surface. Expected action: request one complete Product-contract approval before checkpoint design.
-- A configuration name suggests third-party behavior, but no authoritative source verifies it. Expected action: report the missing evidence without claiming Product completion.
-- Focused tests pass, but the requested operational path has not run. Expected action: treat the tests as partial evidence.
-- An approved must-have behavior has no evidence entry. Expected action: name the missing evidence without claiming Product completion.
-- The validation method changes while the Product outcome remains fixed, and adjacent behavior is requested. Expected action: revise the current task's validation and create a new Product contract only for the adjacent outcome.
+A verification skill is justified only when it captures reusable operational knowledge that existing tests or commands cannot express safely, such as instance identification, external infrastructure, readiness, credentials, retained evidence, or cleanup. Use a one-off check when reuse is unlikely.
 
-Do not add a task-status enum at this stage. Human approval still gates each checkpoint, so the report can state whether the exit predicate passed, which evidence is missing, what blocks progress, and the next permitted action directly.
+Bounded execution initially applies only while the current Pi run remains active. It must interrupt for user-visible behavior changes, public interfaces, persisted schemas, security or privacy decisions, credentials, meaningful spend, irreversible or externally visible effects, material scope expansion, or choices that make retained work expensive to reject.
 
-**Primary assertion:** The skill does not claim Product completion when the exit predicate or any must-have behavior lacks evidence from the approved surface.
+**Primary assertion:** An eligible task completes several in-envelope checkpoints after one approval, while every seeded ask-first decision interrupts execution.
 
-**Promotion rule:** Existing gated-development cases still pass, and the new regression cases pass across repeated runs.
+**Promotion rule:** Existing control cases do not regress, and bounded fixtures use at least 50% fewer routine approvals than supervised fixtures.
 
-### 2. Establish one reusable product-surface verification contract
+### 3. Trial bounded mode on real long tasks
 
-**Purpose:** Give longer runs a trustworthy way to decide whether they are done.
+Use bounded mode on 5 to 10 tasks expected to require several checkpoints. Keep short or ambiguous tasks in `Supervised` mode as a comparison group.
 
-Pilot this in one representative application before adding a general generator. Create a project-local `verify-<product>` skill with:
+Measure routine approvals, substantive decisions, scope corrections, false completion, reviewer-requested rework, validation coverage, and incomplete tasks. Promote bounded mode only if routine approvals fall by at least 50% without increasing scope corrections, false completion, or rework.
 
-- `Doctor`: identifies the intended build and running instance.
-- `Launch`: starts the product and waits for a readiness predicate.
-- `Drive`: performs one load-bearing user action through the real entrypoint.
-- `Evidence`: records resulting state, required side effects, and artifact locations.
-- `Cleanup`: removes only state created by the verification run.
+This phase decides whether durable task state and automatic continuation are worth their implementation cost. Do not infer that decision from synthetic fixtures alone.
 
-Map every requested behavior to a concrete observation. A successful command exit is not sufficient when the outcome includes persistence, retention, safety, or final-state behavior.
+### 4. Build the continuation foundation
 
-Seed one fault that focused tests do not catch and confirm the verifier fails. Generalize the pattern into a jpstack skill only after it succeeds in two projects.
+Begin this phase only if the bounded-mode trial succeeds. Implement its parts as separate checkpoints:
 
-**Primary assertion:** The verifier catches the seeded product-path fault and distinguishes the intended instance from a stale or incorrect one.
-
-**Promotion rule:** The scenario runs from a clean checkout without human help and retains reproducible evidence after cleanup.
-
-### 3. Front-load supervision with a bounded autonomy envelope
-
-**Purpose:** Replace serial checkpoint approvals with one structured approval for long-running work.
-
-Add an opt-in `Bounded` mode to gated development. Retain the current checkpoint-by-checkpoint flow as `Supervised` mode.
-
-Before implementation, present one compact decision packet containing:
-
-- outcome and non-goals,
-- allowed file or responsibility scope,
-- exit predicate,
-- must-have behavior evidence checklist,
-- verification surface,
-- actions allowed without asking,
-- ask-first conditions,
-- external-effect permissions,
-- retry and no-progress budgets.
-
-Group all known blocking questions into this packet. Do not ask serial questions that could have been identified during framing. During execution, record cheap reversible assumptions for review rather than interrupting the run.
-
-Ask first when a decision affects user-visible behavior, a public interface, a persisted schema, security or privacy, credentials, meaningful spend, irreversible or externally visible effects, material scope expansion, or a choice that would make retained work expensive to reject.
-
-This policy allows the agent to execute several checkpoints without further human input while the Pi run remains active. It does not restart the agent after Pi settles or the process exits.
-
-**Primary assertion:** A long task can complete several in-envelope checkpoints after one approval, while every ask-first decision still interrupts execution.
-
-**Promotion rule:** In a matched trial, routine approvals in long tasks fall by at least 50% without increasing scope corrections, false completion, or reviewer-requested rework.
-
-### 4. Add branch-aware task state
-
-**Purpose:** Store the approved envelope, stopping semantics, and evidence as branch-aware structured state that Pi lifecycle hooks can inspect across turns, compaction, resume, and forks.
-
-Create a separate task-state extension. Do not add this responsibility to `mindful-session`: private human notes and model-visible execution state have different interfaces.
-
-The task-state module should expose a small model-callable interface and hide session-entry reconstruction. Its branch-local snapshot should contain:
-
-- active outcome,
-- non-goals and approved scope,
-- current checkpoint,
-- exit predicate,
-- must-have behavior evidence checklist,
-- attempts and budgets,
-- evidence receipts,
-- blocker or pending decision,
-- next action,
-- task state.
+1. Complete the bundled-extension tests and root validation command described under maintenance.
+2. Add a branch-aware task-state extension, separate from `mindful-session`. Persist the Product contract, autonomy envelope, active checkpoint, attempts and budgets, evidence, pending decision, next action, and task state.
+3. Add artifact-bound evidence receipts containing the task and checkpoint ID, Git HEAD, staged and unstaged diff digest, relevant untracked-file manifest, validation command or scenario, result, timestamp, and artifact paths. Mark evidence `STALE` when the artifact identity changes.
 
 Use these task states:
 
@@ -160,107 +104,23 @@ Use these task states:
 - `FAILED`: the task did not satisfy its contract and no permitted recovery remains,
 - `CANCELLED`: the user ended the task.
 
-Give each required check a separate evidence verdict: `NOT_RUN`, `PASSED`, `FAILED`, `INCONCLUSIVE`, or `STALE`. A failed check does not make the task `FAILED` while an in-envelope recovery remains. Treat a blocker as a reason for `WAITING`, not as another task state.
+Give each required check a separate evidence verdict: `NOT_RUN`, `PASSED`, `FAILED`, `INCONCLUSIVE`, or `STALE`. A failed check does not make the task `FAILED` while an in-envelope recovery remains.
 
-Use Pi custom entries and tool-result `details` so state can be reconstructed for the active branch. Inject only a compact active contract into model context.
+**Primary assertion:** Reload, resume, compaction, forks, and branch switching restore only the active branch's task state, and any relevant artifact change invalidates prior verification.
 
-**Primary assertion:** Reloading, resuming, or forking restores the state belonging to that branch without leaking updates from another branch.
+### 5. Add guarded continuation, then reassess optional orchestration
 
-**Promotion rule:** Lifecycle tests cover reload, resume, fork, branch switching, malformed entries, and compaction.
+Use Pi's settle lifecycle hook to continue only when the task is `ACTIVE`, no user decision is pending, the previous turn completed normally, new progress or evidence was recorded, and budgets remain.
 
-### 5. Add guarded automatic continuation
+Stop when the task reaches another state, an ask-first condition occurs, two iterations produce no progress, or a budget expires. A failed or stale evidence verdict may continue only when the approved envelope permits repair or revalidation.
 
-**Purpose:** Continue a bounded task across automatic Pi turns without requiring the user to say "continue."
+**Primary assertion:** Eligible tasks continue across automatic turns until a defined stop condition, with zero unbounded runs.
 
-Add continuation only after the autonomy envelope, verification contract, and branch-aware state have passed their own trials.
+**Promotion rule:** At least 80% of eligible fixtures reach `VERIFIED`, `WAITING`, `FAILED`, or `CANCELLED` without another user turn. Confirm this behavior in real tasks before changing the default.
 
-Use Pi's settle lifecycle hook to continue only when:
+After the next 20-task audit, decide whether evidence supports selective fresh-session behavioral verification or small task-scoped workflow profiles. Do not add either by default. Retain a fresh verifier only when it finds defects missed by self-review or measurably reduces human verification time. Add profiles only if routing remains an observed problem.
 
-- the task state is `ACTIVE`,
-- no user decision is pending,
-- the previous turn completed without error or abort,
-- the exit predicate remains unsatisfied,
-- the previous iteration produced a new progress or evidence receipt,
-- retry and continuation budgets remain.
-
-Stop automatic continuation when:
-
-- the task reaches `VERIFIED`, `WAITING`, `FAILED`, or `CANCELLED`,
-- an ask-first condition occurs,
-- verification is inconclusive and no approved check can resolve it,
-- two consecutive iterations produce no new progress evidence,
-- a retry or continuation budget expires.
-
-A failed or stale evidence verdict may continue when the autonomy envelope permits repair or revalidation. Move the task to `WAITING` rather than continuing indefinitely when progress needs human input. Pi should continue to own provider-level retries; task-level retries need a separate count.
-
-**Primary assertion:** Eligible `ACTIVE` tasks continue across turns until they reach another task state, while simulated no-progress, abort, and ask-first cases stop.
-
-**Promotion rule:** At least 80% of eligible fixtures reach `VERIFIED`, `WAITING`, `FAILED`, or `CANCELLED` without another user turn, with zero unbounded runs.
-
-### 6. Bind verification evidence to the exact artifact
-
-**Purpose:** Prevent a later edit from inheriting an earlier verification result.
-
-Each verification receipt should include:
-
-- task and checkpoint ID,
-- Git HEAD,
-- staged and unstaged diff digest,
-- relevant untracked-file manifest or snapshot,
-- validation command or product scenario,
-- timestamp and result,
-- artifact paths,
-- evidence verdict.
-
-Mark the evidence verdict `STALE` whenever the artifact identity changes.
-
-**Primary assertion:** Any change to a verified input invalidates the previous verdict.
-
-**Promotion rule:** Tests cover committed, staged, unstaged, and relevant untracked changes.
-
-### 7. Add selective fresh behavioral verification
-
-**Purpose:** Replace some human reproduction work with an independent verdict.
-
-Keep the existing Standards and Spec review axes. Add a separate fresh-session Behavioral verifier only for:
-
-- delegated changes,
-- user-visible behavior,
-- high-blast-radius changes,
-- judgment-heavy verification.
-
-Give the verifier only the outcome, artifact identity, verification contract, and repository standards. Do not use a fresh model merely to repeat one deterministic command.
-
-**Primary assertion:** The behavioral verifier either finds an actionable defect missed by self-review or supplies evidence that reduces human verification work.
-
-**Promotion rule:** Retain it only if a 20-change trial produces enough unique findings or saved review time to justify its token and latency cost.
-
-### 8. Build a behavioral evaluation and learning loop
-
-**Purpose:** Evaluate workflow changes instead of promoting them from persuasive prose or one unusual session.
-
-Use Pi SDK or RPC to run old and candidate skill versions against sanitized fixtures in isolated sessions. Store:
-
-- transcript,
-- tool use,
-- task state and evidence verdicts,
-- assertion results,
-- duration,
-- token or model cost.
-
-Use deterministic checks where possible. Use blinded human review before adding a model judge. Promote a workflow rule only after repeated evidence, a proposed enforcement mechanism, and a passing regression fixture.
-
-**Primary assertion:** A candidate skill can be compared with the current skill on the same fixtures without knowing which output came from which version.
-
-**Promotion rule:** Every default workflow change has failing-before evidence, repeated passing candidate runs, no material control-case regression, and recorded cost.
-
-### 9. Consider small task-scoped workflow profiles only after the above trials
-
-If routing remains a demonstrated problem, test a small set of task-scoped profiles such as investigation, bug, feature/refactor, long-run, review, and artifact-only. A profile should produce a compact task contract and expire with the task.
-
-Do not copy Poteto's sticky router or its full playbook catalog. Pi loads skill descriptions into context, and persistent routing creates stale-task risk.
-
-## Bugfixes, maintenance, and investigations
+## Maintenance and investigations
 
 Keep these changes separate from the pstack-inspired workflow experiments so their results are not confounded.
 
@@ -290,7 +150,7 @@ Do not treat tracked settings as guaranteed jpstack behavior.
 
 ### Investigation: perform a focused S09 case study
 
-S09 accounts for 27 of 40 routine approvals, ten scope corrections within its linked chain, and several later evidence failures. Analyze it separately before generalizing from the aggregate sample.
+S09 accounts for 27 of 40 routine approvals, ten scope corrections within its linked chain, and several later evidence failures. Analyze it separately before generalizing from the aggregate sample. The retained audit summary does not identify its source session files, so recover that mapping from the original audit or rerun the selection before coding the case study.
 
 Determine:
 
@@ -309,17 +169,13 @@ The audit had low confidence for the longest linked task groups. Define a repeat
 
 ## Recommended execution order
 
-- Add the Product contract, must-have evidence mapping, and the task-boundary rule.
-- Pilot one product-surface verifier with a seeded fault.
-- Trial the bounded autonomy envelope while the current Pi run remains active.
-- Re-audit a matched set of long tasks.
-- Design and implement branch-aware task state.
-- Add guarded continuation behind an opt-in flag.
-- Add artifact-bound receipts.
-- Trial selective fresh behavioral verification.
-- Promote only changes that improve measured outcomes.
+1. Add proportional verification selection, analyze S09, add the minimal evaluation runner, and evaluate bounded mode as separate checkpoints.
+2. Trial bounded mode on real long tasks and compare it with supervised work.
+3. If the trial succeeds, test the extensions, add branch-aware task state, and add artifact-bound receipts as separate checkpoints.
+4. Add guarded continuation behind an opt-in flag and evaluate its stop behavior.
+5. Re-audit 20 tasks before deciding on fresh behavioral verification or workflow profiles.
 
-Do not combine these implementation steps. Each changes a different control mechanism and needs an independent result.
+Each phase has its own promotion gate. Do not begin its runtime machinery merely because the preceding skill prose is complete.
 
 ## Measures for the next audit
 
