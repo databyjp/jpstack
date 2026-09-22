@@ -2,18 +2,18 @@
 name: gated-development
 description: >-
   Use for non-trivial codebase changes where misunderstanding or a large diff
-  would make review or rework expensive. Agree on the outcome, then use
-  supervised checkpoints or an opt-in bounded execution envelope. Do not use
+  would make review or rework expensive. Agree on the outcome and execution
+  packet, then complete independently testable checkpoints within it. Do not use
   when code is only a means to produce a non-code artifact.
 ---
 
 # Evidence-first gated development
 
-The human approves the Product outcome before implementation. `Supervised` mode
-requires approval for one executable checkpoint at a time. Opt-in `Bounded` mode
-allows several independently testable checkpoints within one approved execution
-envelope. Both modes preserve Product boundaries, ask-first decisions, and
-evidence-mapped completion. Prefer working evidence over speculative design.
+The human approves the Product outcome and an execution packet before the work
+covered by that packet. The agent completes independently testable checkpoints
+within it, preserving Product boundaries, ask-first decisions, and
+evidence-mapped completion. The human may request checkpoint-by-checkpoint
+review. Prefer working evidence over speculative design.
 
 ## Choose a lane
 
@@ -22,14 +22,9 @@ evidence-mapped completion. Prefer working evidence over speculative design.
 
 State the recommended lane. When uncertain, use Gated.
 
-## Choose a supervision mode
+## Approve an execution packet
 
-Use `Supervised` by default. Recommend `Bounded` only when the Product contract
-is stable, the work needs several checkpoints, the allowed scope and validation
-surfaces are concrete, and unresolved ask-first decisions are unlikely. Keep
-short, exploratory, ambiguous, or externally risky work in `Supervised`.
-
-The human chooses the mode. A Bounded approval packet contains:
+For Gated work, present one execution packet containing:
 
 - the complete Product contract;
 - the planned checkpoint sequence and allowed files, components, or operations;
@@ -40,28 +35,32 @@ The human chooses the mode. A Bounded approval packet contains:
 - checkpoint, retry, cost, duration, and no-progress budgets that apply;
 - the conditions for completion, interruption, or failure.
 
+Group unresolved decisions before requesting approval. When only investigation
+can resolve an uncertainty, the packet may authorize one discovery checkpoint
+and require review after it. The human may request checkpoint-by-checkpoint
+review for any packet. This changes review cadence, not the safety rules.
+
 State exact providers, targets, regions, cost caps, cleanup duties, and retained
 evidence for any authorized external action. Permission for one target or action
 does not imply permission for another.
 
-A Bounded approval applies only to its Product task and the active Pi run. Do not
-carry it into a new outcome, session, fork, or restart, and do not reconstruct it
-when the approved packet is unavailable. Bounded mode adds no persistence or
+An execution packet applies only to its Product task and the active Pi run. Do
+not carry it into a new outcome, session, fork, or restart, and do not reconstruct
+it when the approved packet is unavailable. The packet adds no persistence or
 automatic settle-loop continuation.
 
 ## Development loop
 
-1. Establish the Product contract and supervision mode.
+1. Establish the Product contract, group unresolved decisions, and obtain
+   approval for the execution packet.
 2. Identify the riskiest current assumption or next observable behavior.
-3. Define one executable checkpoint and apply the split test.
-4. In `Supervised`, get explicit approval for its contract and review target. In
-   `Bounded`, confirm that it fits the approved packet.
-5. Implement, validate, and map the evidence to the Product contract.
-6. In `Supervised`, stop. In `Bounded`, continue only under the bounded-execution
-   rules below.
+3. Define one executable checkpoint, apply the split test, and confirm that it
+   fits the approved packet.
+4. Implement, validate, and map the evidence to the Product contract.
+5. Continue within the packet, or stop under the execution rules below.
 
 If implementation exposes a choice not already settled by the approved contract
-or Bounded packet, ask first when it affects user-visible behavior, a persisted
+or execution packet, ask first when it affects user-visible behavior, a persisted
 schema or public interface, introduces a significant dependency or architectural
 seam, affects security, privacy, credentials, destructive action, external
 effects, or meaningful cost, would materially constrain later retained work or
@@ -79,7 +78,7 @@ Clarification is not implementation approval.
 
 ## Product contract
 
-Present one compact approval request containing:
+Define the Product contract inside the first execution packet:
 
 - **Outcome:** the problem and user-visible result, stated as black-box behavior
   that a user can verify without knowing the implementation
@@ -92,10 +91,9 @@ Present one compact approval request containing:
 
 Keep workflow and technical design out unless the user made them Product
 constraints. Distinguish must-have behavior from suggestions and optional
-follow-ups. In `Supervised`, stop for one explicit Product-contract approval
-before designing or requesting approval for a checkpoint. In `Bounded`, include
-the Product contract in the Bounded packet; approval of that packet is also
-Product-contract approval.
+follow-ups. Include the Product contract in the first execution packet; approval
+of that packet is also Product-contract approval. A later packet for the same
+Product task may reference the approved contract.
 
 The Product contract defines the task boundary. Start a new task only when the
 outcome or non-goals materially change. A changed checkpoint, implementation
@@ -137,7 +135,7 @@ new task unless the Product outcome or non-goals change.
 A checkpoint has one primary executable assertion. It may contribute only part
 of the evidence needed for the Product outcome.
 
-Apply this split test before seeking approval:
+Apply this split test when defining a checkpoint:
 
 > Could two claimed results fail independently while either result would still
 > provide useful evidence?
@@ -193,7 +191,11 @@ Do not add a module seam merely to wrap a checkpoint.
 
 ## Checkpoint contract
 
-Present this compact contract for approval:
+Define each checkpoint with this compact contract. Include planned checkpoints
+in the execution packet; record narrower repair or revalidation checkpoints
+before executing them. When the Product contract is approved but no execution
+packet is active, place the next checkpoint in a packet with its scope,
+permissions, interruption conditions, and budgets, then request one approval:
 
 - **Kind:** capability checkpoint, disposable spike, integration checkpoint, or
   production slice
@@ -240,31 +242,30 @@ For each checkpoint, restate or record its contract, then:
    passes and every must-have behavior has current evidence from the approved
    validation surface.
 
-In `Supervised`, report the checkpoint evidence and stop. You may identify the
-likely next checkpoint from evidence already gathered, but do not investigate,
-design, or implement it before review.
+Continue without another approval only when the next checkpoint is listed in the
+packet or is a narrower repair or revalidation of a listed checkpoint, all
+actions remain within the approved scope and permissions, no ask-first condition
+is unresolved, and every applicable budget remains. Before continuing, record
+the completed checkpoint's contract, artifact changes, evidence result, consumed
+budgets, retries, and reason for continuing. For grouped external actions, record
+the result and consumed budget of each action separately.
 
-In `Bounded`, continue without another approval only when the next checkpoint is
-listed in the packet or is a narrower repair or revalidation of a listed
-checkpoint, all actions remain within the approved scope and permissions, no
-ask-first condition is unresolved, and every applicable budget remains. Before
-continuing, record the completed checkpoint's contract, artifact changes,
-evidence result, consumed budgets, retries, and reason for continuing. For
-grouped external actions, record the result and consumed budget of each action
-separately.
+If the human requested checkpoint-by-checkpoint review, report the completed
+checkpoint and stop before investigating or starting the next one.
 
 An artifact change already approved by the packet may make earlier evidence
 stale. Require fresh validation for the changed artifact, but do not interrupt
 when that validation is listed in the packet and its budgets remain.
 
-A Bounded iteration records progress only when it changes an in-scope artifact
-or produces new evidence that changes what is known. Stop after two consecutive
-iterations without progress, or sooner when the approved packet has a stricter
-limit. Do not offer an equivalent retry as recovery unless new evidence makes it
-materially different. A failed or inconclusive check permits another attempt
-only when the packet allows the repair and its retry budget remains.
+An execution iteration records progress only when it changes an in-scope
+artifact or produces new evidence that changes what is known. Stop after two
+consecutive iterations without progress, or sooner when the approved packet has
+a stricter limit. Do not offer an equivalent retry as recovery unless new
+evidence makes it materially different. A failed or inconclusive check permits
+another attempt only when the packet allows the repair and its retry budget
+remains.
 
-Interrupt Bounded execution when:
+Interrupt execution when:
 
 - the Product outcome or non-goals change;
 - the next useful checkpoint is outside the packet;
@@ -274,9 +275,9 @@ Interrupt Bounded execution when:
 - progress, retry, cost, duration, or checkpoint budget is exhausted; or
 - the user interrupts.
 
-When Bounded execution completes or interrupts, report all checkpoint results,
-the evidence mapped to each must-have behavior, consumed budgets, the stop
-reason, and any decision now required.
+When execution completes or interrupts, report all checkpoint results, the
+evidence mapped to each must-have behavior, consumed budgets, the stop reason,
+and any decision now required.
 
 ## Split example
 
@@ -293,8 +294,7 @@ uncertainty.
 Use `jp-coding-preferences-reporting`. In addition, compare approved and actual
 files and review surface, report each primary assertion as passed, failed, or
 unverified, map new evidence to the Product contract, name must-have behavior
-that remains unverified, and confirm excluded behavior remains absent. For
-Bounded work, also report why each continuation was permitted and which budget
-stopped or completed the run. Do not claim Product completion unless the exit
-predicate and every must-have behavior have current evidence from the approved
-validation surface.
+that remains unverified, and confirm excluded behavior remains absent. Report
+why each continuation was permitted and which budget stopped or completed the
+run. Do not claim Product completion unless the exit predicate and every
+must-have behavior have current evidence from the approved validation surface.

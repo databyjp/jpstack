@@ -1,8 +1,8 @@
-# S09 bounded-autonomy case study
+# S09 execution-packet case study
 
 ## Purpose
 
-This case study tests whether the audit label S09 supports a bounded-autonomy mode. It separates Product tasks, classifies approval-only turns, and converts observed failures into sanitized fixtures.
+This case study tests whether the audit label S09 supports task-scoped execution packets. It separates Product tasks, classifies approval-only turns, and converts observed failures into sanitized fixtures.
 
 ## Source and limits
 
@@ -10,7 +10,7 @@ The original audit grouped sessions by Pi `parentSession` links. Reconstructing 
 
 The raw sessions remain outside this repository. This document does not copy credentials, absolute paths, provider identifiers, retained run identifiers, or user-authored source. Its conclusions come from the chronological user and assistant messages in each session's own delta, excluding inherited history.
 
-The main limitation is grouping. A parent-session link establishes conversational continuity, not one Product task. The classifications below are retrospective judgments, not causal evidence that bounded mode would have produced the preferred result.
+The main limitation is grouping. A parent-session link establishes conversational continuity, not one Product task. The classifications below are retrospective judgments, not causal evidence that an execution packet would have produced the preferred result.
 
 ## Main finding
 
@@ -43,7 +43,7 @@ A future audit should group by Product outcome and non-goals. Session ancestry s
 
 The original audit called all 27 exact continuation responses routine approvals because they added no requirement in their text. Context changes that interpretation. A conservative reclassification yields:
 
-| Task | Approval-only turns | Bounded-eligible continuation | Retain as Product or ask-first gate |
+| Task | Approval-only turns | In-envelope continuation | Retain as Product or ask-first gate |
 | --- | ---: | ---: | ---: |
 | Evaluation-task calibration | 2 | 2 | 0 |
 | Single-condition execution | 7 | 4 | 3 |
@@ -54,7 +54,7 @@ The original audit called all 27 exact continuation responses routine approvals 
 | Brownfield migration task | 4 | 2 | 2 |
 | **Total** | **27** | **13** | **14** |
 
-A turn is bounded-eligible when it only authorizes the next known, in-scope, reversible checkpoint and no ask-first condition intervenes. Examples included:
+A turn is in-envelope when it only authorizes the next known, in-scope checkpoint and no ask-first condition intervenes. Examples included:
 
 - replacing a duplicated negative fixture with a temporary source transformation;
 - adding already-agreed explanatory comments;
@@ -75,7 +75,7 @@ A turn remains a gate when it approves or settles:
 - required versus recommended benchmark behavior;
 - a scoring boundary that changes pass and fail outcomes.
 
-Under this classification, S09 supplies a baseline of 13 bounded-eligible continuation turns, not 27. Removing half means eliminating at least seven while preserving all 14 retained gates. The classification should be tested against blinded fixtures before becoming a target for real tasks.
+Under this classification, S09 supplies a baseline of 13 in-envelope continuation turns, not 27. Removing half means eliminating at least seven while preserving all 14 retained gates. The classification should be tested against blinded fixtures before becoming a target for real tasks.
 
 ## Why approvals repeated
 
@@ -102,7 +102,7 @@ These were not failures to obtain enough continuation approvals. They came from 
 
 ## Verification evidence
 
-Several evidence transitions matter for bounded mode:
+Several evidence transitions matter for execution packets:
 
 | Earlier evidence | Later observation | Required response |
 | --- | --- | --- |
@@ -118,7 +118,7 @@ A passing lower-level check was useful evidence in each case. The error was prom
 
 ## Decisions to front-load
 
-A bounded packet could have grouped these decisions when each Product task began:
+An execution packet could have grouped these decisions when each Product task began:
 
 - approved outcome, non-goals, and task boundary;
 - sequential execution, no automatic retries, and no output-directory reuse;
@@ -132,7 +132,7 @@ The packet could also authorize cheap implementation choices such as fixture gen
 
 It could not safely pre-approve an unknown host-control-plane exposure, a new SaaS provider, a changed persisted schema, a different scoring boundary, a new Product outcome, or spending beyond the stated cap.
 
-## Sanitized bounded-mode fixtures
+## Sanitized execution-packet fixtures
 
 These outlines are encoded as generic cases in `skills/gated-development/evals/evals.json`.
 
@@ -184,10 +184,10 @@ These outlines are encoded as generic cases in `skills/gated-development/evals/e
 
 **Expected:** Stop retrying, enter `WAITING`, retain the failure evidence, and offer materially different options. Do not repeat equivalent API calls.
 
-## Implications for bounded mode
+## Implications for execution packets
 
-- Recommend bounded mode by Product task, never by session lineage.
-- Count only bounded-eligible continuation turns in the reduction target.
+- Scope each execution packet to one Product task, never a session lineage.
+- Count only in-envelope continuation turns in the reduction target.
 - Track Product and ask-first gates as a separate safety measure. Do not count them as removable approvals.
 - Require an evidence map that distinguishes focused, rehearsal, and paid-run claims.
 - Mark prior evidence stale when task, runtime, verifier, or scorer identity changes.
