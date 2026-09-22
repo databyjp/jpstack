@@ -2,7 +2,7 @@
 
 ## Status
 
-The Product contract, task-boundary rule, and evidence mapping were implemented in commit `79b55c3`. The remaining phases are proposals and should be implemented as separate executable checkpoints.
+The Product contract, task-boundary rule, and evidence mapping were implemented in commit `79b55c3`. Commit `07df5f1` added proportional verification selection and compressed this roadmap. The working tree adds the S09 case study, an opt-in Bounded mode, and eight bounded-mode evaluation cases. The remaining work should proceed as separate executable checkpoints.
 
 This handoff proposes independently testable improvements to `jpstack`. The main goal is to reduce low-value human supervision by moving decisions to the start of a task, grouping related decisions, and allowing bounded execution between human reviews. It does not propose a broad autonomous orchestrator or a sticky workflow router.
 
@@ -13,19 +13,21 @@ A read-only audit screened 465 Pi session headers and analyzed the 20 newest eli
 Key results:
 
 - Median user turns before implementation: 1, range 0-4.
-- Routine continuation approvals: 40 across 8 tasks.
-- One long task, S09, accounted for 27 of the 40 approvals.
-- S09, S10, and S13 accounted for 86 of 124 substantive product-decision turns.
-- Scope corrections: 3 of 20 tasks.
-- Supported false-completion cases: 2 of 20 tasks.
-- Reviewer-requested rework: 2 of 20 tasks.
-- Full requested-behavior coverage: 11 of 20 tasks.
-- Product-surface validation: 5 of 20 tasks.
-- Incomplete tasks: 4 of 20 tasks.
+- Approval-only continuation turns: 40 across 8 session groups.
+- The linked session chain labeled S09 accounted for 27 of the 40 turns.
+- S09, S10, and S13 accounted for 86 of 124 substantive Product-decision turns under the original grouping.
+- Scope corrections: 3 of 20 original groups.
+- Supported false-completion cases: 2 of 20 original groups.
+- Reviewer-requested rework: 2 of 20 original groups.
+- Full requested-behavior coverage: 11 of 20 original groups.
+- Product-surface validation: 5 of 20 original groups.
+- Incomplete groups: 4 of 20.
 
-The audit supports two conclusions:
+The S09 case study found that its 23-session lineage contained at least seven Product tasks. Of its 27 approval-only turns, 13 were conservative candidates for bounded continuation and 14 approved a new Product outcome or crossed an ask-first boundary. See `references/s09-bounded-autonomy-case-study.md`.
 
-1. Repeated approval is mainly a long-task problem. Excluding S09 leaves 13 routine approvals across 19 tasks. Do not relax supervision for every task based on this sample.
+The evidence supports two conclusions:
+
+1. Session lineage is not a task boundary. Do not use S09's 27 turns as a single-task autonomy baseline. Evaluate bounded mode against the 13 reclassified continuation turns while preserving all 14 Product and ask-first gates.
 2. Verification coverage is the broader problem. Both false-completion cases relied on evidence that did not support the reported result. Product execution found gaps that focused tests missed, but product execution alone did not guarantee full requirement coverage.
 
 ## Existing material
@@ -39,6 +41,7 @@ Read these sources before changing the workflow:
 - `pi-extensions/mindful-session/README.md`
 - `pi-extensions/mindful-session/index.ts`
 - `references/loops-you-can-trust.md`
+- `references/s09-bounded-autonomy-case-study.md`
 - `references/the-complete-guide-to-pstack-pt-1.md`
 - `references/the-complete-guide-to-pstack-pt-2.md`
 
@@ -59,18 +62,18 @@ The five phases below organize the work. They do not permit combining implementa
 
 Commit `79b55c3` added one Product-contract approval containing the outcome, non-goals, must-have behaviors, exit predicate, and validation surface. It also requires evidence for every must-have behavior before claiming Product completion and starts a new task only when the outcome or non-goals materially change.
 
-Keep the existing per-checkpoint approval flow while the remaining policy changes are evaluated.
+`Supervised` remains the default. `Bounded` is available only through an explicit task-scoped approval packet.
 
 ### 2. Design and evaluate bounded mode
 
 **Purpose:** Replace serial continuation approvals with one structured approval for eligible long-running work.
 
-Implement this phase as four separate checkpoints:
+This phase contains four separate checkpoints:
 
-1. Add a verification-selection rule to `gated-development`. The agent should choose the cheapest existing executable surface that establishes each must-have behavior. It should not prefer product execution when static or unit evidence fully establishes the behavior, and it should not create a verification skill that merely wraps an existing test suite.
-2. Perform the focused S09 case study described below. Convert its routine approvals, necessary decisions, scope corrections, and verification corrections into sanitized fixtures.
-3. Add a minimal Pi SDK or RPC evaluation runner for baseline-versus-candidate skill comparisons. Store transcripts, tool calls, duration, usage, and assertion results. Use deterministic checks where possible and blinded human review for semantic judgments. Do not add a model judge yet.
-4. Add an opt-in `Bounded` mode while retaining `Supervised` mode. The agent recommends a mode, and the human approves `Bounded` once through a packet containing the Product contract, allowed scope, permitted actions, verification plan, ask-first conditions, external-effect permissions, and retry and no-progress budgets.
+1. **Completed:** Add a verification-selection rule to `gated-development`. The agent chooses the cheapest existing executable surface that establishes each must-have behavior and does not create a verification skill that merely wraps an existing test suite.
+2. **Completed:** Perform the focused S09 case study. `references/s09-bounded-autonomy-case-study.md` reclassifies approvals, identifies Product boundaries, and defines sanitized fixtures.
+3. **Deferred:** Do not build a general Pi SDK or RPC evaluation runner unless repeated manual comparisons become expensive or inconsistent. The current cases use isolated `pi --mode json` invocations and direct human assessment.
+4. **Completed:** Add an opt-in `Bounded` mode while retaining `Supervised` mode. The human approves one task-scoped packet containing the Product contract, allowed scope, permitted actions, verification plan, ask-first conditions, external-effect permissions, and retry and no-progress budgets.
 
 A verification skill is justified only when it captures reusable operational knowledge that existing tests or commands cannot express safely, such as instance identification, external infrastructure, readiness, credentials, retained evidence, or cleanup. Use a one-off check when reuse is unlikely.
 
@@ -78,13 +81,13 @@ Bounded execution initially applies only while the current Pi run remains active
 
 **Primary assertion:** An eligible task completes several in-envelope checkpoints after one approval, while every seeded ask-first decision interrupts execution.
 
-**Promotion rule:** Existing control cases do not regress, and bounded fixtures use at least 50% fewer routine approvals than supervised fixtures.
+**Synthetic result:** The baseline passed 6 of 8 S09-derived cases; the candidate passed 8 of 8. All 12 existing controls passed after one retained-test clarification. The candidate's clear gains were continuing after a completed checkpoint and recording each authorized external action separately. No seeded Product, schema, security, external-effect, or no-progress stop was suppressed. This supports an opt-in real-work trial, not a default-mode change.
 
-### 3. Trial bounded mode on real long tasks
+### 3. Trial bounded mode on real multi-checkpoint Product tasks
 
-Use bounded mode on 5 to 10 tasks expected to require several checkpoints. Keep short or ambiguous tasks in `Supervised` mode as a comparison group.
+Use bounded mode on 5 to 10 Product tasks expected to require several checkpoints. Keep short or ambiguous tasks in `Supervised` mode as a comparison group.
 
-Measure routine approvals, substantive decisions, scope corrections, false completion, reviewer-requested rework, validation coverage, and incomplete tasks. Promote bounded mode only if routine approvals fall by at least 50% without increasing scope corrections, false completion, or rework.
+Measure bounded-eligible continuation turns, preserved Product and ask-first gates, substantive decisions, scope corrections, false completion, reviewer-requested rework, validation coverage, and incomplete tasks. Promote bounded mode only if bounded-eligible continuation turns fall by at least 50% without suppressing a required gate or increasing scope corrections, false completion, or rework.
 
 This phase decides whether durable task state and automatic continuation are worth their implementation cost. Do not infer that decision from synthetic fixtures alone.
 
@@ -148,20 +151,9 @@ Document which behavior is:
 
 Do not treat tracked settings as guaranteed jpstack behavior.
 
-### Investigation: perform a focused S09 case study
+### Completed investigation: focused S09 case study
 
-S09 accounts for 27 of 40 routine approvals, ten scope corrections within its linked chain, and several later evidence failures. Analyze it separately before generalizing from the aggregate sample. The retained audit summary does not identify its source session files, so recover that mapping from the original audit or rerun the selection before coding the case study.
-
-Determine:
-
-- why approvals repeated,
-- whether the Product outcome changed,
-- where a new task boundary should have been created,
-- which decisions could have been front-loaded,
-- which questions correctly interrupted work,
-- which verification evidence became stale or proved incomplete.
-
-The result should refine the autonomy-envelope and task-boundary fixtures, not become a repository-specific workflow rule by itself.
+`references/s09-bounded-autonomy-case-study.md` records the result. The 23 linked sessions contained at least seven Product tasks, so the original grouping overstated one task's continuation burden. The study reclassifies 13 of 27 approval-only turns as bounded-eligible, preserves 14 Product or ask-first gates, and defines sanitized fixtures for task boundaries, security stops, persisted outcome semantics, stale evidence, grouped external-run approval, and no-progress stops.
 
 ### Investigation: improve future audit grouping
 
@@ -169,11 +161,10 @@ The audit had low confidence for the longest linked task groups. Define a repeat
 
 ## Recommended execution order
 
-1. Add proportional verification selection, analyze S09, add the minimal evaluation runner, and evaluate bounded mode as separate checkpoints.
-2. Trial bounded mode on real long tasks and compare it with supervised work.
-3. If the trial succeeds, test the extensions, add branch-aware task state, and add artifact-bound receipts as separate checkpoints.
-4. Add guarded continuation behind an opt-in flag and evaluate its stop behavior.
-5. Re-audit 20 tasks before deciding on fresh behavioral verification or workflow profiles.
+1. Trial bounded mode on real Product tasks that need several checkpoints and compare it with supervised work.
+2. If the trial succeeds, test the extensions, add branch-aware task state, and add artifact-bound receipts as separate checkpoints.
+3. Add guarded continuation behind an opt-in flag and evaluate its stop behavior.
+4. Re-audit 20 tasks before deciding on an evaluation runner, fresh behavioral verification, or workflow profiles.
 
 Each phase has its own promotion gate. Do not begin its runtime machinery merely because the preceding skill prose is complete.
 
@@ -186,7 +177,7 @@ Use the previous 20-task audit as the baseline. Compare:
 | Full requested-behavior coverage | 55% | At least 80% |
 | Supported false-completion cases | 10% | 0 |
 | Tasks without a terminal report | 20% | Below 10% |
-| Routine approvals in long tasks | S09 had 27 | Reduce by at least 50% |
+| Bounded-eligible continuation turns | S09 had 13 after reclassification | Reduce by at least 50% |
 | Tasks with scope correction | 15% | No increase |
 | Tasks with reviewer-requested rework | 10% | No increase |
 
@@ -212,7 +203,7 @@ Do not add these without separate evidence of need:
 The next agent should call the Skill tool for:
 
 - `gated-development` before implementing each non-trivial checkpoint,
-- `tdd` for the extension tests, task-state behavior, and evaluation runner,
+- `tdd` for the extension tests and task-state behavior,
 - `codebase-design` before choosing the task-state interface or seam,
 - `code-documentation` when adding the model-callable task-state interface,
 - `domain-modeling` only if a hard-to-reverse task-state or receipt decision warrants an ADR,

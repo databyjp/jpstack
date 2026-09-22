@@ -2,16 +2,18 @@
 name: gated-development
 description: >-
   Use for non-trivial codebase changes where misunderstanding or a large diff
-  would make review or rework expensive. Agree on the outcome, then implement
-  one approved executable checkpoint at a time. Do not use when code is only a
-  means to produce a non-code artifact.
+  would make review or rework expensive. Agree on the outcome, then use
+  supervised checkpoints or an opt-in bounded execution envelope. Do not use
+  when code is only a means to produce a non-code artifact.
 ---
 
 # Evidence-first gated development
 
-The human approves the Product outcome and one executable checkpoint at a time.
-A checkpoint gathers evidence toward the outcome; it need not prove the whole
-outcome. Prefer working evidence over speculative design.
+The human approves the Product outcome before implementation. `Supervised` mode
+requires approval for one executable checkpoint at a time. Opt-in `Bounded` mode
+allows several independently testable checkpoints within one approved execution
+envelope. Both modes preserve Product boundaries, ask-first decisions, and
+evidence-mapped completion. Prefer working evidence over speculative design.
 
 ## Choose a lane
 
@@ -20,18 +22,56 @@ outcome. Prefer working evidence over speculative design.
 
 State the recommended lane. When uncertain, use Gated.
 
+## Choose a supervision mode
+
+Use `Supervised` by default. Recommend `Bounded` only when the Product contract
+is stable, the work needs several checkpoints, the allowed scope and validation
+surfaces are concrete, and unresolved ask-first decisions are unlikely. Keep
+short, exploratory, ambiguous, or externally risky work in `Supervised`.
+
+The human chooses the mode. A Bounded approval packet contains:
+
+- the complete Product contract;
+- the planned checkpoint sequence and allowed files, components, or operations;
+- permitted local and external actions;
+- the validation plan and required evidence;
+- Product, interface, schema, security, privacy, credential, spending,
+  destructive-action, and external-effect conditions that require interruption;
+- checkpoint, retry, cost, duration, and no-progress budgets that apply;
+- the conditions for completion, interruption, or failure.
+
+State exact providers, targets, regions, cost caps, cleanup duties, and retained
+evidence for any authorized external action. Permission for one target or action
+does not imply permission for another.
+
+A Bounded approval applies only to its Product task and the active Pi run. Do not
+carry it into a new outcome, session, fork, or restart, and do not reconstruct it
+when the approved packet is unavailable. Bounded mode adds no persistence or
+automatic settle-loop continuation.
+
 ## Development loop
 
-1. Agree on the Product contract.
+1. Establish the Product contract and supervision mode.
 2. Identify the riskiest current assumption or next observable behavior.
 3. Define one executable checkpoint and apply the split test.
-4. Get explicit approval for its contract and review target.
-5. Implement, validate, map the evidence to the Product contract, and stop.
-6. Record durable decisions, then propose the next checkpoint.
+4. In `Supervised`, get explicit approval for its contract and review target. In
+   `Bounded`, confirm that it fits the approved packet.
+5. Implement, validate, and map the evidence to the Product contract.
+6. In `Supervised`, stop. In `Bounded`, continue only under the bounded-execution
+   rules below.
 
-If implementation exposes a choice not already settled by the approved contract, ask first when it affects user-visible behavior, a persisted schema or public interface, introduces a significant dependency or architectural seam, affects security, privacy, destructive action, or meaningful cost, would materially constrain later retained work or make rejecting the choice require substantial rework, or affects most of the proposed change.
+If implementation exposes a choice not already settled by the approved contract
+or Bounded packet, ask first when it affects user-visible behavior, a persisted
+schema or public interface, introduces a significant dependency or architectural
+seam, affects security, privacy, credentials, destructive action, external
+effects, or meaningful cost, would materially constrain later retained work or
+make rejecting the choice require substantial rework, or affects most of the
+proposed change.
 
-Otherwise make and record an assumption that is cheap to reject at the next review: it creates no external effects, does not materially constrain later work, and can be discarded without substantial rework. Git reversibility alone does not satisfy this test.
+Otherwise make and record an assumption that is cheap to reject at the next
+review: it creates no unauthorized external effects, does not materially
+constrain later work, and can be discarded without substantial rework. Git
+reversibility alone does not satisfy this test.
 
 A decision packet contains the decision, recommendation, main trade-off, and one
 question. Ask the user for concrete choices without repeating settled background.
@@ -52,8 +92,10 @@ Present one compact approval request containing:
 
 Keep workflow and technical design out unless the user made them Product
 constraints. Distinguish must-have behavior from suggestions and optional
-follow-ups. Stop for one explicit Product-contract approval before designing or
-requesting approval for a checkpoint.
+follow-ups. In `Supervised`, stop for one explicit Product-contract approval
+before designing or requesting approval for a checkpoint. In `Bounded`, include
+the Product contract in the Bounded packet; approval of that packet is also
+Product-contract approval.
 
 The Product contract defines the task boundary. Start a new task only when the
 outcome or non-goals materially change. A changed checkpoint, implementation
@@ -112,7 +154,8 @@ to observe the assertion.
   production stack when known. Keep its behavior narrow and retain the code.
 - **Disposable spike:** answers a question whose code should not enter the
   product. Use one only when throwaway work is materially cheaper or production
-  concerns would obscure the evidence.
+  concerns would obscure the evidence. Do not use one when a narrow retained
+  test can guard an intended dependency or Product invariant.
 - **Integration checkpoint:** tests one uncertain interaction between named
   parts. Exercise one behaviorally trivial path; stub parts outside it.
 - **Production slice:** delivers one retained observable behavior through the
@@ -180,7 +223,7 @@ category, or materially larger review surface.
 
 ## Execution
 
-Restate the approved contract, then:
+For each checkpoint, restate or record its contract, then:
 
 1. Implement only what the primary assertion requires.
 2. Track actual files and the approximate maintained-code review surface.
@@ -193,11 +236,47 @@ Restate the approved contract, then:
    every `Do not implement` item remains absent.
 7. Map the checkpoint evidence to the must-have behaviors it supports. Name each
    must-have behavior that still lacks evidence.
-8. Report the evidence and stop. Claim that the Product outcome is complete only
-   when the exit predicate passes and every must-have behavior has current
-   evidence from the approved validation surface. You may identify the likely
-   next checkpoint from evidence already gathered, but do not investigate,
-   design, or implement it before review.
+8. Claim that the Product outcome is complete only when the exit predicate
+   passes and every must-have behavior has current evidence from the approved
+   validation surface.
+
+In `Supervised`, report the checkpoint evidence and stop. You may identify the
+likely next checkpoint from evidence already gathered, but do not investigate,
+design, or implement it before review.
+
+In `Bounded`, continue without another approval only when the next checkpoint is
+listed in the packet or is a narrower repair or revalidation of a listed
+checkpoint, all actions remain within the approved scope and permissions, no
+ask-first condition is unresolved, and every applicable budget remains. Before
+continuing, record the completed checkpoint's contract, artifact changes,
+evidence result, consumed budgets, retries, and reason for continuing. For
+grouped external actions, record the result and consumed budget of each action
+separately.
+
+An artifact change already approved by the packet may make earlier evidence
+stale. Require fresh validation for the changed artifact, but do not interrupt
+when that validation is listed in the packet and its budgets remain.
+
+A Bounded iteration records progress only when it changes an in-scope artifact
+or produces new evidence that changes what is known. Stop after two consecutive
+iterations without progress, or sooner when the approved packet has a stricter
+limit. Do not offer an equivalent retry as recovery unless new evidence makes it
+materially different. A failed or inconclusive check permits another attempt
+only when the packet allows the repair and its retry budget remains.
+
+Interrupt Bounded execution when:
+
+- the Product outcome or non-goals change;
+- the next useful checkpoint is outside the packet;
+- an unresolved choice crosses an ask-first boundary;
+- an external action lacks exact permission or would exceed its limit;
+- evidence invalidates an approved safety, scope, or validation assumption;
+- progress, retry, cost, duration, or checkpoint budget is exhausted; or
+- the user interrupts.
+
+When Bounded execution completes or interrupts, report all checkpoint results,
+the evidence mapped to each must-have behavior, consumed budgets, the stop
+reason, and any decision now required.
 
 ## Split example
 
@@ -212,8 +291,10 @@ uncertainty.
 ## Review report
 
 Use `jp-coding-preferences-reporting`. In addition, compare approved and actual
-files and review surface, report the primary assertion as passed, failed, or
+files and review surface, report each primary assertion as passed, failed, or
 unverified, map new evidence to the Product contract, name must-have behavior
-that remains unverified, and confirm excluded behavior remains absent. Do not
-claim Product completion unless the exit predicate and every must-have behavior
-have current evidence from the approved validation surface.
+that remains unverified, and confirm excluded behavior remains absent. For
+Bounded work, also report why each continuation was permitted and which budget
+stopped or completed the run. Do not claim Product completion unless the exit
+predicate and every must-have behavior have current evidence from the approved
+validation surface.
