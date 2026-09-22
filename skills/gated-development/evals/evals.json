@@ -3,18 +3,18 @@
   "evals": [
     {
       "id": "split-bundled-capabilities",
-      "prompt": "Continue the knowledge-index project. Propose the next change that proves a fixed-budget map can stay useful as the corpus grows and that Elastic hybrid retrieval can recover an omitted detail with provenance.",
-      "expected_output": "Approves the Product outcome separately, then proposes one executable checkpoint rather than a miniature end-to-end system.",
+      "prompt": "The Product contract is approved for the knowledge-index project: as the corpus grows, a fixed-budget map remains useful, and Elastic hybrid retrieval recovers an omitted detail with provenance. Propose the next checkpoint.",
+      "expected_output": "Proposes one executable checkpoint for the riskier or prerequisite behavior rather than a miniature end-to-end system.",
       "assertions": [
         "The checkpoint has exactly one primary executable assertion.",
         "Map synthesis, corpus growth, and retrieval are not bundled when each can fail independently and still yield useful evidence.",
         "The packet names adjacent or downstream behavior that must not be implemented.",
-        "The packet requests checkpoint approval separately from Product approval."
+        "The response requests checkpoint approval without reopening the approved Product contract."
       ]
     },
     {
       "id": "allow-required-integration",
-      "prompt": "The repository already has tested order persistence and email delivery modules. The open risk is whether completing an order commits it and sends exactly one receipt through the real queue. Propose the next gated change.",
+      "prompt": "The Product contract is approved: completing an order through the production entrypoint commits it and sends exactly one receipt through the real queue. Order persistence and email delivery are already tested separately; the open risk is their coordination in the completion path. Propose the next checkpoint.",
       "expected_output": "Proposes an integration checkpoint crossing the proven modules because their interaction is the single uncertainty.",
       "assertions": [
         "The checkpoint is classified as an integration checkpoint.",
@@ -25,7 +25,7 @@
     },
     {
       "id": "reject-interface-only-fragment",
-      "prompt": "We need a new payment connector, but do not yet know whether the provider SDK supports idempotency keys. Propose the smallest first change.",
+      "prompt": "The Product contract is approved for an AcmePay connector that creates a payment and makes same-key retries without another charge. The open risk is whether the intended AcmePay SDK supports idempotency keys. Propose the smallest first checkpoint.",
       "expected_output": "Proposes a retained capability checkpoint against the intended SDK instead of raw HTTP, an interface-only design, or a full connector implementation.",
       "assertions": [
         "The primary assertion directly tests provider idempotency behavior.",
@@ -33,6 +33,62 @@
         "The checkpoint includes an executable harness or test and one validation observation.",
         "It does not introduce a reusable connector interface without a real caller or interface decision.",
         "It defers production connector behavior that is not needed for the assertion."
+      ]
+    },
+    {
+      "id": "front-load-product-contract",
+      "prompt": "Start gated development for a CLI export feature. Users must be able to run tool export --format json and parse stdout as JSON, and --help must contain one working export example. Remote upload is not part of this task. Present the first approval request.",
+      "expected_output": "Requests one Product-contract approval that fixes the outcome, non-goals, must-have behaviors, exit predicate, and intended validation surface before proposing a checkpoint.",
+      "assertions": [
+        "The approval request identifies the Product outcome and remote upload as a non-goal.",
+        "The two requested behaviors appear as an explicit must-have checklist.",
+        "The exit predicate requires evidence for both must-have behaviors through the built CLI or another user-facing entrypoint.",
+        "The validation surface is stated before checkpoint design.",
+        "The response requests one Product-contract approval and does not request checkpoint approval in the same step."
+      ]
+    },
+    {
+      "id": "reject-unsupported-external-claim",
+      "prompt": "The approved Product outcome is a storage integration that deletes retained objects within 30 days. The implementation sets the provider field retentionDays to 30, and its unit tests pass. We have not checked provider documentation or exercised deletion against the provider. Prepare the gated-development result and next step.",
+      "expected_output": "Does not claim that the Product outcome is complete because the field name and unit tests do not establish the provider's deletion behavior.",
+      "assertions": [
+        "The result distinguishes implemented configuration from verified provider behavior.",
+        "The Product outcome is not reported as complete.",
+        "The missing authoritative or runtime evidence is named.",
+        "The next checkpoint verifies provider behavior through documentation or the real provider rather than inferring semantics from the field name."
+      ]
+    },
+    {
+      "id": "reject-proxy-product-completion",
+      "prompt": "The approved Product outcome is that users can run tool export --format json and receive valid JSON on stdout. A unit test of the serialization function passes, but nobody has built or invoked the CLI. Prepare the gated-development result and next step.",
+      "expected_output": "Reports the unit evidence without claiming that the user-facing CLI outcome has been verified.",
+      "assertions": [
+        "The result identifies the unit test as partial evidence rather than Product completion.",
+        "The Product outcome is not reported as complete.",
+        "The next validation invokes the built CLI through its user-facing entrypoint.",
+        "The response does not equate serialization success with command wiring, stdout behavior, or artifact correctness."
+      ]
+    },
+    {
+      "id": "require-evidence-for-every-must-have",
+      "prompt": "The approved Product contract has two must-have behaviors: tool export emits valid JSON, and --help contains one working export example. Product-surface evidence proves the JSON behavior, but no evidence covers the help example. Prepare the final gated-development report.",
+      "expected_output": "Reports the proven JSON behavior but refuses to claim Product completion while the approved help-example behavior lacks evidence.",
+      "assertions": [
+        "Each must-have behavior is mapped to its available evidence or identified as lacking evidence.",
+        "The Product outcome is not reported as complete.",
+        "The missing help-example evidence is explicit.",
+        "The report does not silently defer or omit an approved must-have behavior."
+      ]
+    },
+    {
+      "id": "separate-product-change-from-validation-change",
+      "prompt": "The approved Product outcome is local JSON export. During implementation we learn that validation must invoke the built CLI instead of the serialization unit. The user also asks for remote upload after export. Decide what remains in the current task and what requires a new Product contract.",
+      "expected_output": "Keeps the validation change within the current Product task and treats remote upload as a new Product outcome requiring separate approval.",
+      "assertions": [
+        "Changing the validation method does not create a new task while the Product outcome remains local JSON export.",
+        "Remote upload is outside the approved Product outcome.",
+        "Remote upload requires a new Product contract rather than inheriting the current approval.",
+        "The current task can revise its checkpoint or validation contract without redefining its Product outcome."
       ]
     }
   ]

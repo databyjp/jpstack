@@ -22,11 +22,11 @@ State the recommended lane. When uncertain, use Gated.
 
 ## Development loop
 
-1. Agree on the Product outcome.
+1. Agree on the Product contract.
 2. Identify the riskiest current assumption or next observable behavior.
 3. Define one executable checkpoint and apply the split test.
 4. Get explicit approval for its contract and review target.
-5. Implement, validate, report the evidence, and stop.
+5. Implement, validate, map the evidence to the Product contract, and stop.
 6. Record durable decisions, then propose the next checkpoint.
 
 If implementation exposes a choice not already settled by the approved contract, ask first when it affects user-visible behavior, a persisted schema or public interface, introduces a significant dependency or architectural seam, affects security, privacy, destructive action, or meaningful cost, would materially constrain later retained work or make rejecting the choice require substantial rework, or affects most of the proposed change.
@@ -37,12 +37,30 @@ A decision packet contains the decision, recommendation, main trade-off, and one
 question. Ask the user for concrete choices without repeating settled background.
 Clarification is not implementation approval.
 
-## Product outcome
+## Product contract
 
-Agree on the problem, user-visible outcome, and non-goals. State them as
-black-box behavior that a user can verify without knowing the implementation.
-Keep workflow and technical design out unless the user made them product
-constraints. Stop for explicit Product approval.
+Present one compact approval request containing:
+
+- **Outcome:** the problem and user-visible result, stated as black-box behavior
+  that a user can verify without knowing the implementation
+- **Non-goals:** adjacent behavior that this task will not deliver
+- **Must-have behaviors:** the complete set of approved behavior that requires
+  evidence before claiming the Product outcome is complete
+- **Exit predicate:** the checkable condition that establishes the outcome
+- **Validation surface:** the intended user-facing entrypoint or closest
+  executable surface that can establish the exit predicate
+
+Keep workflow and technical design out unless the user made them Product
+constraints. Distinguish must-have behavior from suggestions and optional
+follow-ups. Stop for one explicit Product-contract approval before designing or
+requesting approval for a checkpoint.
+
+The Product contract defines the task boundary. Start a new task only when the
+outcome or non-goals materially change. A changed checkpoint, implementation
+path, or validation method remains in the same task while the outcome and
+non-goals remain fixed. Revise the affected contract with approval when the
+change crosses an ask-first boundary. Do not carry approval into an adjacent
+Product outcome.
 
 ## One-checkpoint rule
 
@@ -145,7 +163,13 @@ Restate the approved contract, then:
 5. Map every changed file to the primary assertion. Revert unrelated changes.
 6. Classify each approved constraint as passed, failed, or deferred. Confirm that
    every `Do not implement` item remains absent.
-7. Report the evidence and stop. You may identify the likely next checkpoint from evidence already gathered, but do not investigate, design, or implement it before review.
+7. Map the checkpoint evidence to the must-have behaviors it supports. Name each
+   must-have behavior that still lacks evidence.
+8. Report the evidence and stop. Claim that the Product outcome is complete only
+   when the exit predicate passes and every must-have behavior has current
+   evidence from the approved validation surface. You may identify the likely
+   next checkpoint from evidence already gathered, but do not investigate,
+   design, or implement it before review.
 
 ## Split example
 
@@ -161,4 +185,7 @@ uncertainty.
 
 Use `jp-coding-preferences-reporting`. In addition, compare approved and actual
 files and review surface, report the primary assertion as passed, failed, or
-unverified, and confirm excluded behavior remains absent.
+unverified, map new evidence to the Product contract, name must-have behavior
+that remains unverified, and confirm excluded behavior remains absent. Do not
+claim Product completion unless the exit predicate and every must-have behavior
+have current evidence from the approved validation surface.

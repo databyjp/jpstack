@@ -59,27 +59,29 @@ Implement and evaluate these changes one at a time. Each step should remain usef
 
 **Purpose:** Define explicit task-level completion and stopping semantics before automating continuation.
 
-Update `skills/gated-development/SKILL.md` so each task contract includes:
+Update `skills/gated-development/SKILL.md` so one Product-contract approval includes:
 
 - one Product outcome,
 - explicit non-goals,
+- an approved must-have behavior checklist,
 - a checkable exit predicate,
-- the intended validation surface,
-- a checklist mapping requested behaviors to required evidence,
-- one terminal status: `VERIFIED`, `FAILED`, `BLOCKED`, or `INCONCLUSIVE`.
+- the intended validation surface.
 
-Define `VERIFIED` narrowly: every requested behavior has evidence from the agreed validation surface, and the tested artifact is the artifact being reported.
+Do not claim Product completion unless the exit predicate passes and every must-have behavior has current evidence from the approved validation surface. Suggestions and optional follow-ups do not block completion unless the Product contract includes them as must-have behavior.
 
-Add a task-boundary rule. Start a new task contract when the Product outcome, verification contract, or requested behavior set materially changes. Do not carry approval from an adjacent task into the new contract.
+Add a task-boundary rule. Start a new task only when the Product outcome or non-goals materially change. A changed checkpoint, implementation path, or validation method remains in the same task while its outcome and non-goals remain fixed. Do not carry approval into an adjacent Product outcome.
 
 Add sanitized evaluation cases based on the audit:
 
-- A configuration name suggests third-party behavior, but no authoritative source verifies it. Expected status: `INCONCLUSIVE`.
-- Focused tests pass, but the requested operational path has not run. Expected status: not `VERIFIED`.
-- A requested example or behavior has no evidence entry. Expected status: not `VERIFIED`.
-- Adjacent work changes the outcome or verification contract. Expected action: start a new task contract.
+- Product framing omits the must-have checklist, exit predicate, or validation surface. Expected action: request one complete Product-contract approval before checkpoint design.
+- A configuration name suggests third-party behavior, but no authoritative source verifies it. Expected action: report the missing evidence without claiming Product completion.
+- Focused tests pass, but the requested operational path has not run. Expected action: treat the tests as partial evidence.
+- An approved must-have behavior has no evidence entry. Expected action: name the missing evidence without claiming Product completion.
+- The validation method changes while the Product outcome remains fixed, and adjacent behavior is requested. Expected action: revise the current task's validation and create a new Product contract only for the adjacent outcome.
 
-**Primary assertion:** The skill refuses to report `VERIFIED` when any requested behavior lacks evidence from the agreed surface.
+Do not add a task-status enum at this stage. Human approval still gates each checkpoint, so the report can state whether the exit predicate passed, which evidence is missing, what blocks progress, and the next permitted action directly.
+
+**Primary assertion:** The skill does not claim Product completion when the exit predicate or any must-have behavior lacks evidence from the approved surface.
 
 **Promotion rule:** Existing gated-development cases still pass, and the new regression cases pass across repeated runs.
 
@@ -114,7 +116,7 @@ Before implementation, present one compact decision packet containing:
 - outcome and non-goals,
 - allowed file or responsibility scope,
 - exit predicate,
-- requested-behavior evidence checklist,
+- must-have behavior evidence checklist,
 - verification surface,
 - actions allowed without asking,
 - ask-first conditions,
@@ -143,12 +145,22 @@ The task-state module should expose a small model-callable interface and hide se
 - non-goals and approved scope,
 - current checkpoint,
 - exit predicate,
-- requested-behavior evidence checklist,
+- must-have behavior evidence checklist,
 - attempts and budgets,
 - evidence receipts,
 - blocker or pending decision,
 - next action,
-- terminal status.
+- task state.
+
+Use these task states:
+
+- `ACTIVE`: work remains and the autonomy envelope permits another action,
+- `WAITING`: continuation requires human input or an external condition,
+- `VERIFIED`: the exit predicate passed and all required evidence is current,
+- `FAILED`: the task did not satisfy its contract and no permitted recovery remains,
+- `CANCELLED`: the user ended the task.
+
+Give each required check a separate evidence verdict: `NOT_RUN`, `PASSED`, `FAILED`, `INCONCLUSIVE`, or `STALE`. A failed check does not make the task `FAILED` while an in-envelope recovery remains. Treat a blocker as a reason for `WAITING`, not as another task state.
 
 Use Pi custom entries and tool-result `details` so state can be reconstructed for the active branch. Inject only a compact active contract into model context.
 
@@ -164,27 +176,26 @@ Add continuation only after the autonomy envelope, verification contract, and br
 
 Use Pi's settle lifecycle hook to continue only when:
 
-- the task remains active,
+- the task state is `ACTIVE`,
 - no user decision is pending,
 - the previous turn completed without error or abort,
 - the exit predicate remains unsatisfied,
 - the previous iteration produced a new progress or evidence receipt,
 - retry and continuation budgets remain.
 
-Stop when:
+Stop automatic continuation when:
 
-- the exit predicate passes,
+- the task reaches `VERIFIED`, `WAITING`, `FAILED`, or `CANCELLED`,
 - an ask-first condition occurs,
-- verification returns `FAILED` or `INCONCLUSIVE`,
-- the artifact no longer matches its evidence,
+- verification is inconclusive and no approved check can resolve it,
 - two consecutive iterations produce no new progress evidence,
 - a retry or continuation budget expires.
 
-Return `BLOCKED` rather than continuing indefinitely. Pi should continue to own provider-level retries; task-level retries need a separate count.
+A failed or stale evidence verdict may continue when the autonomy envelope permits repair or revalidation. Move the task to `WAITING` rather than continuing indefinitely when progress needs human input. Pi should continue to own provider-level retries; task-level retries need a separate count.
 
-**Primary assertion:** Eligible tasks continue across turns until a terminal status, while simulated no-progress, abort, and ask-first cases stop.
+**Primary assertion:** Eligible `ACTIVE` tasks continue across turns until they reach another task state, while simulated no-progress, abort, and ask-first cases stop.
 
-**Promotion rule:** At least 80% of eligible fixtures reach a terminal status without another user turn, with zero unbounded runs.
+**Promotion rule:** At least 80% of eligible fixtures reach `VERIFIED`, `WAITING`, `FAILED`, or `CANCELLED` without another user turn, with zero unbounded runs.
 
 ### 6. Bind verification evidence to the exact artifact
 
@@ -199,9 +210,9 @@ Each verification receipt should include:
 - validation command or product scenario,
 - timestamp and result,
 - artifact paths,
-- verdict.
+- evidence verdict.
 
-Mark the receipt stale whenever the artifact identity changes.
+Mark the evidence verdict `STALE` whenever the artifact identity changes.
 
 **Primary assertion:** Any change to a verified input invalidates the previous verdict.
 
@@ -232,7 +243,7 @@ Use Pi SDK or RPC to run old and candidate skill versions against sanitized fixt
 
 - transcript,
 - tool use,
-- terminal status,
+- task state and evidence verdicts,
 - assertion results,
 - duration,
 - token or model cost.
@@ -298,7 +309,7 @@ The audit had low confidence for the longest linked task groups. Define a repeat
 
 ## Recommended execution order
 
-- Add completion statuses, evidence mapping, and the task-boundary rule.
+- Add the Product contract, must-have evidence mapping, and the task-boundary rule.
 - Pilot one product-surface verifier with a seeded fault.
 - Trial the bounded autonomy envelope while the current Pi run remains active.
 - Re-audit a matched set of long tasks.
