@@ -22,6 +22,8 @@ class AddSymlinksCliTests(unittest.TestCase):
                 / "pi-agent/APPEND_SYSTEM.md",
                 home / ".pi/agent/extensions/final-stamp": REPO_ROOT
                 / "pi-extensions/final-stamp",
+                home / ".pi/agent/extensions/mindful-session": REPO_ROOT
+                / "pi-extensions/mindful-session",
                 home / ".agents/skills": REPO_ROOT / "skills",
             }
             for target, source in expected_links.items():

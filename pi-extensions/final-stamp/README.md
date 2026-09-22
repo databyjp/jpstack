@@ -23,7 +23,7 @@ The assistant rule prevents orphaned timestamps when `pi-calm` hides thinking an
 Install the directory as a local Pi package:
 
 ```sh
-pi install ~/code/jpstack/extensions/final-stamp
+pi install ~/code/agents/jpstack/extensions/final-stamp
 ```
 
 Run `/reload` after installation and after source changes.
