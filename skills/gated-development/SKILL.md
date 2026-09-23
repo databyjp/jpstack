@@ -1,10 +1,10 @@
 ---
 name: gated-development
 description: >-
-  Use for non-trivial codebase changes where misunderstanding or a large diff
-  would make review or rework expensive. Agree on the outcome and execution
-  packet, then complete independently testable checkpoints within it. Do not use
-  when code is only a means to produce a non-code artifact.
+  Govern non-trivial development whose outcome requires executable evidence.
+  Agree on the Product outcome and execution packet, then complete independently
+  testable checkpoints. Use contract-scaffold instead when the final outcome is
+  intentionally incomplete source for interface or contract review.
 ---
 
 # Evidence-first gated development
@@ -184,10 +184,15 @@ Use a design packet only when the next checkpoint depends on a contract,
 interface, ownership, data location, or failure decision. Use `codebase-design`
 when choosing an interface or seam.
 
-Show file trees, signatures, invariants, or errors only when they constrain the
-checkpoint. Prefer executable sources of truth such as a compiling interface
-with a real caller, contract test, narrow adapter, dry run, or walking skeleton.
-Do not add a module seam merely to wrap a checkpoint.
+Use `contract-scaffold` as the primary skill when the requested outcome is
+intentionally incomplete source for review. When a scaffold is one phase of a
+working Product outcome, this skill remains primary and `contract-scaffold`
+governs that design phase.
+
+Show only the file tree, declarations, invariants, or errors that constrain the
+next checkpoint. Prefer a compiling interface with a real caller, contract test,
+narrow adapter, dry run, or walking skeleton. Do not add a seam merely to wrap a
+checkpoint.
 
 ## Checkpoint contract
 

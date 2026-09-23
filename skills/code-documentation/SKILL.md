@@ -11,6 +11,9 @@ description: >-
 Documentation attached to a declaration is part of the module's interface.
 Implementation comments help maintainers understand and safely change the code.
 
+Unless instructed to, keep each declaration focused on its caller-visible contract.
+Rather than documenting design omissions or future plans.
+
 ## Interface documentation
 
 * **Document every external interface.** Document each externally visible
@@ -57,6 +60,35 @@ Implementation comments help maintainers understand and safely change the code.
 * **Keep documentation durable and reachable.** Do not preserve development
   chronology or refer to stack layers, tickets, sprints, or prior discussion.
   Put change history in commits and broader architectural trade-offs in an ADR.
+
+### Injected collaborators
+
+Document the capability or variation that an injected collaborator gives the
+enclosing interface. Explain what behavior the caller selects, along with any
+ownership, reuse, ordering, or lifecycle contract that matters.
+
+Do not paraphrase the collaborator's type or method names. If the enclosing
+docstring already explains the relationship and there is no additional
+parameter contract, omit the `Args` entry.
+
+Rather than:
+
+```python
+Args:
+    trial_executor: Adapter that executes individual Trials.
+```
+
+Prefer:
+
+```python
+"""Run Experiment orchestration through a caller-selected execution mechanism.
+
+`TrialExecutor` lets the same orchestration submit Trials to Harbor or to a
+deterministic in-process implementation.
+"""
+```
+
+Only document concrete alternatives when the interface actually supports them.
 
 ## Examples
 

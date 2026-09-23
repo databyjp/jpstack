@@ -13,6 +13,27 @@ Prefer precise, established technical terminology over ambiguous shorthand. For 
 - Project-level instructions override these defaults.
 - Reduce the cognitive load of task reports. For coding tasks, strongly consider using the `/show-me` skill.
 
+### Development workflow
+
+Before a non-trivial codebase change, load `gated-development` and let it select
+the Small or Gated lane.
+
+Use `contract-scaffold` as the primary skill when the final artifact is
+intentionally incomplete source for interface or contract review. For a working
+outcome, keep `gated-development` primary and use `contract-scaffold` only as a
+design gate.
+
+Prefer that gate when the next executable checkpoint depends on an unsettled
+public interface, persisted schema, protocol, error model, ownership decision,
+or architectural seam that would be expensive to reject after implementation.
+Include the recommendation in the execution packet rather than asking a separate
+preliminary question.
+
+Skip the scaffold when the interface is established, revision is inexpensive,
+or a narrow executable checkpoint would resolve the uncertainty more directly.
+Ask only when the approaches have materially different cost, review cadence, or
+retained artifacts and neither is clearly preferable.
+
 ## Project documentation
 
 Keep documentation accurate, durable, and easy to navigate for humans and agents.

@@ -1,0 +1,39 @@
+{
+  "skill_name": "contract-scaffold",
+  "evals": [
+    {
+      "id": "standalone-interface-scaffold",
+      "prompt": "Sketch an interface-first Python runner for one experiment definition. Use real declarations and docstrings, but leave behavior unimplemented. Treat definitions/ and GLOSSARY.md as authoritative. Do not add tests, dependencies, a CLI, or working integrations. Finish with decisions to review before tests.",
+      "expected_output": "Treats the scaffold as the final design artifact, applies gated governance before non-trivial edits, and stops before tests or behavior implementation.",
+      "assertions": [
+        "The proposed outcome is a reviewable scaffold rather than a working runner.",
+        "The scaffold starts at the caller-facing interface and adds only necessary supporting declarations.",
+        "Missing domain decisions are surfaced instead of invented.",
+        "Validation is limited to structural claims and does not claim working Product behavior.",
+        "The report provides a reading order, intentional holes, excluded behavior, and decisions required before tests."
+      ]
+    },
+    {
+      "id": "scaffold-phase-of-working-product",
+      "prompt": "Use gated development to implement a working export feature. The public interface is unsettled and expensive to change after implementation, so produce an interface scaffold for review before writing tests or behavior.",
+      "expected_output": "Keeps gated-development primary and uses contract-scaffold only for an approved design phase before executable checkpoints.",
+      "assertions": [
+        "Gated-development remains primary because the final outcome is working behavior.",
+        "The scaffold is proposed in the execution packet as a design gate rather than a separate Product outcome.",
+        "The workflow stops for the requested interface review before tests or behavior implementation.",
+        "The scaffold is not reported as evidence that export behavior works."
+      ]
+    },
+    {
+      "id": "prefer-executable-checkpoint-over-scaffold",
+      "prompt": "Implement a local bug fix behind an established interface. The change is inexpensive to revise, and one narrow regression test can reproduce and verify it. Decide whether to start with a contract scaffold.",
+      "expected_output": "Skips the scaffold because the interface is established and a narrow executable checkpoint resolves the task more directly.",
+      "assertions": [
+        "The response does not introduce a scaffold merely because source code will change.",
+        "The established interface is treated as sufficient design context.",
+        "The narrow executable regression checkpoint is preferred as stronger evidence.",
+        "No separate scaffold approval question is introduced."
+      ]
+    }
+  ]
+}
