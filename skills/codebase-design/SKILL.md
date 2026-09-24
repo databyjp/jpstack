@@ -63,6 +63,7 @@ When designing an interface, ask:
 - **The deletion test.** Imagine deleting the module. If complexity vanishes, it was a pass-through. If complexity reappears across N callers, it was earning its keep.
 - **The interface is the test surface.** Callers and tests cross the same seam. If you want to test *past* the interface, the module is probably the wrong shape.
 - **One adapter means a hypothetical seam. Two adapters means a real one.** Don't introduce a seam unless something actually varies across it.
+- **Share evidence, not verdicts.** A shared module returns neutral observations: data with typed errors, no decisions. Each caller maps evidence onto its own requirements. Verdicts embed per-caller policy, so sharing them forces sharing the policy; when callers disagree about what evidence means, that disagreement belongs in the caller.
 
 ## Designing for testability
 
@@ -92,7 +93,11 @@ Good interfaces make testing natural:
    }
    ```
 
+   The same rule for policy code: a policy function that returns a decision value beats one that invokes an injected recorder callback. Persistence and other effects stay in one runtime module at the edge, and tests assert returned values instead of stubbing call behavior.
+
 3. **Small surface area.** Fewer methods = fewer tests needed. Fewer params = simpler test setup.
+
+4. **Import cleanly.** Loading the module must not read the environment, filesystem, clock, or network. An import-time side effect makes every policy line downstream of it untestable without live infrastructure.
 
 ## Relationships
 
@@ -112,3 +117,4 @@ Good interfaces make testing natural:
 
 - **Deepening a cluster given its dependencies**, see [DEEPENING.md](DEEPENING.md): dependency categories, seam discipline, and replace-don't-layer testing.
 - **Exploring alternative interfaces**, see [DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md): spin up parallel sub-agents to design the interface several radically different ways, then compare on depth, locality, and seam placement.
+- **Designing a seam for a problem the codebase has never solved**, call the `reference-survey` skill: survey two or three real implementations of the same problem, then distill a decision rule from where they agree and disagree.
