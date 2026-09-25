@@ -37,6 +37,10 @@ Rather than documenting design omissions or future plans.
   such as rationale, an invariant, a dependency, or an edge case. Do not
   narrate the implementation or repeat the interface contract.
 
+* **Explain invisible orchestration guarantees.** Comment ordering constraints,
+  checkpoints, recovery behavior, idempotency, and side-effect boundaries when
+  moving or removing a statement could silently change behavior.
+
 * **Document meaningful internal declarations.** Document private modules,
   types, or callables when their abstraction, contract, or invariant would
   otherwise be costly to infer.
@@ -130,3 +134,15 @@ for listener in list(self._listeners):
 ```
 
 Do not replace this with `# Iterate over listeners`.
+
+### Invisible orchestration guarantee
+
+Explain why a checkpoint occurs at that position:
+
+```python
+# Persist an incomplete run before executing work so failures leave a
+# discoverable record.
+retain_run_progress(complete=False)
+```
+
+Do not replace this with `# Retain run progress`.

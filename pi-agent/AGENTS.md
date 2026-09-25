@@ -76,6 +76,7 @@ Optimize for understanding at the point of use, not minimum line count or docume
 - Use implementation comments to explain internal strategy, rationale, invariants, dependencies, and constraints needed to change the code safely. Keep them near the code they explain. Do not put implementation details in interface documentation or repeat the interface contract inside the implementation.
 - Write comments and docstrings at a different level from the code. Add higher-level abstraction or rationale, or lower-level semantic precision. Do not paraphrase declarations or implementation.
 - Make orchestration read top-down. Extract coherent operations, contracts, or repeated mechanics—not merely to shorten a function—and avoid pass-through helpers that increase navigation.
+- Use blank lines to separate coherent phases within orchestration. Prefer whitespace and clear names for visible phases. Add a local comment only when ordering, recovery, or persistence semantics are not apparent from the statements themselves.
 - Keep behavior-specific inputs, decisions, and expected results close to where they matter. Extract repeated mechanics when doing so removes noise without hiding the behavior.
 
 In tests, favor local readability over deduplication when abstraction would separate a scenario from the data needed to understand its assertions.
