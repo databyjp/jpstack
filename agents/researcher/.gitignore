@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.log
+
+# Generated research and previous last30days conventions
+.research/
+.last30days/
+.last30days-plan.json
+
+# Research outputs are local unless deliberately moved or force-added.
+outputs/*
+!outputs/README.md
