@@ -2,8 +2,8 @@
 name: code-documentation
 description: >-
   Use when writing or reviewing code that adds or changes an externally visible
-  interface, or when writing or reviewing documentation comments or
-  implementation comments.
+  interface, contains decision-dense implementation logic, or when writing or
+  reviewing documentation comments or implementation comments.
 ---
 
 # Code documentation
@@ -11,8 +11,8 @@ description: >-
 Documentation attached to a declaration is part of the module's interface.
 Implementation comments help maintainers understand and safely change the code.
 
-Unless instructed to, keep each declaration focused on its caller-visible contract.
-Rather than documenting design omissions or future plans.
+Unless instructed otherwise, keep each declaration focused on its caller-visible
+contract. Do not document design omissions or future plans.
 
 ## Interface documentation
 
@@ -30,12 +30,30 @@ Rather than documenting design omissions or future plans.
   and use the abstraction without reading its implementation. Describe
   observable behavior, not internal control flow or strategy.
 
+* **Put details at the narrowest owning scope.** Lead module and type
+  documentation with the abstraction and its use before narrower invariants or
+  failure details. Put callable-specific inputs, outputs, side effects, and
+  failures on that callable. Keep an invariant at type level only when it spans
+  operations or callers must understand it before choosing an operation.
+
+* **Describe divided responsibilities as data flow.** When documentation
+  distinguishes the declaration's work from other work, name the subject
+  responsible for each behavior and state what passes between them. Prefer
+  positive input-to-output statements over listing work one subject does not
+  perform. Negative exclusions leave ownership unclear and can imply an extra
+  abstraction.
+
 ## Implementation comments
 
 * **Explain non-obvious implementation decisions.** Add a local comment when
   changing the code safely requires information the code does not make clear,
   such as rationale, an invariant, a dependency, or an edge case. Do not
   narrate the implementation or repeat the interface contract.
+
+* **Review decision-dense code before finishing.** Inspect branches, ordering,
+  conversions, retries, compatibility workarounds, and side effects. Add a
+  nearby comment when names, types, and control flow show what happens but not
+  why the behavior is required.
 
 * **Explain invisible orchestration guarantees.** Comment ordering constraints,
   checkpoints, recovery behavior, idempotency, and side-effect boundaries when
@@ -104,6 +122,25 @@ Describe what a type represents rather than listing visible fields:
 @dataclass(frozen=True)
 class ResolvedExperiment:
     """Validated experiment inputs resolved to project-relative resources."""
+```
+
+### Divided responsibility
+
+Name both subjects and describe their input-to-output relationship:
+
+```python
+"""Task-specific criterion checks supply results in brief order.
+
+This class converts those results into the detailed rubric and Harbor reward
+output.
+"""
+```
+
+Do not replace this with:
+
+```python
+"""Task verifiers record decisions in authored order without implementing
+scoring or output persistence themselves."""
 ```
 
 ### Lower-level precision
