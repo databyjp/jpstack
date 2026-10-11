@@ -12,14 +12,13 @@
       "$HOME/.plannotator/drafts",
       "$HOME/.worktrees/",
       "$HOME/.plannotator/feedback",
-      "$HOME/code/temp",
+      "$HOME/code",
       "$HOME/.local/share/nono-docker-client/buildx"
     ],
     "read": [
       "$HOME/.local/share/mise/installs/node",
       "$HOME/.local/share/mise/installs/python",
       "$HOME/.local/share/nono-docker-client",
-      "$HOME/code",
       "$HOME/.worktrees",
       "$HOME/.claude"
     ],
@@ -38,5 +37,8 @@
       "DOCKER_CONFIG": "$HOME/.local/share/nono-docker-client",
       "BUILDX_CONFIG": "$HOME/.local/share/nono-docker-client/buildx"
     }
+  },
+  "security": {
+    "ipc_mode": "full"
   }
 }
