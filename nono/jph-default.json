@@ -1,27 +1,23 @@
 {
-  "extends": ["pi"],
   "meta": {
-    "name": "pi-mise",
+    "name": "jph-default",
     "version": "",
-    "description": "Pi sandbox with a mise-managed Node and Python runtimes",
+    "description": "JPH default config; includes mise-managed Node and Python runtimes",
     "author": null
   },
   "filesystem": {
     "allow": [
-      "$HOME/.pi-lens",
       "$HOME/.plannotator/drafts",
       "$HOME/.worktrees/",
       "$HOME/.plannotator/feedback",
-      "$HOME/code/temp",
+      "$HOME/code",
       "$HOME/.local/share/nono-docker-client/buildx"
     ],
     "read": [
       "$HOME/.local/share/mise/installs/node",
       "$HOME/.local/share/mise/installs/python",
       "$HOME/.local/share/nono-docker-client",
-      "$HOME/code",
-      "$HOME/.worktrees",
-      "$HOME/.claude"
+      "$HOME/.worktrees"
     ],
     "allow_file": ["$HOME/.plannotator/config.json"],
     "unix_socket": ["$HOME/.colima/default/docker.sock"]

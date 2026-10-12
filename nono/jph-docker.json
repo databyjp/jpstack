@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "name": "jph-docker",
+    "version": "",
+    "description": "JPH docker config for agents to be able to use Docker",
+    "author": null
+  },
+  "filesystem": {
+    "unix_socket": ["$HOME/.colima/default/docker.sock"]
+  },
+  "environment": {
+    "deny_vars": [
+      "DOCKER_CONTEXT",
+      "DOCKER_CERT_PATH",
+      "DOCKER_TLS",
+      "DOCKER_TLS_VERIFY"
+    ],
+    "set_vars": {
+      "DOCKER_HOST": "unix://$HOME/.colima/default/docker.sock",
+      "DOCKER_CONFIG": "$HOME/.local/share/nono-docker-client",
+      "BUILDX_CONFIG": "$HOME/.local/share/nono-docker-client/buildx"
+    }
+  }
+}
