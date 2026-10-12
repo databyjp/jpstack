@@ -7,9 +7,8 @@
   },
   "filesystem": {
     "allow": [
-      "$HOME/.plannotator/drafts",
+      "$HOME/.plannotator",
       "$HOME/.worktrees/",
-      "$HOME/.plannotator/feedback",
       "$HOME/code",
       "$HOME/.local/share/nono-docker-client/buildx"
     ],
