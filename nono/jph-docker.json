@@ -6,6 +6,12 @@
     "author": null
   },
   "filesystem": {
+    "allow": [
+      "$HOME/.local/share/nono-docker-client/buildx"
+    ],
+    "read": [
+      "$HOME/.local/share/nono-docker-client"
+    ],
     "unix_socket": ["$HOME/.colima/default/docker.sock"]
   },
   "environment": {

@@ -1,5 +1,5 @@
 {
-  "extends": ["jph-default", "pi"],
+  "extends": ["jph-default", "jph-docker", "pi"],
   "meta": {
     "name": "pi-jph",
     "version": "",
@@ -9,7 +9,7 @@
   "filesystem": {
     "allow": [
       "$HOME/.pi-lens"
-    ],    
+    ],
     "read": [
       "$HOME/.claude"
     ]

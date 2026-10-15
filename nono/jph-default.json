@@ -6,32 +6,20 @@
     "author": null
   },
   "filesystem": {
+    "deny": ["$WORKDIR/.git"],
     "allow": [
       "$HOME/.plannotator",
       "$HOME/.worktrees/",
-      "$HOME/code",
-      "$HOME/.local/share/nono-docker-client/buildx"
+      "$HOME/.config/",
+      "$HOME/code"
     ],
     "read": [
+      "$WORKDIR/.git",
       "$HOME/.local/share/mise/installs/node",
       "$HOME/.local/share/mise/installs/python",
-      "$HOME/.local/share/nono-docker-client",
       "$HOME/.worktrees"
     ],
     "allow_file": ["$HOME/.plannotator/config.json"],
-    "unix_socket": ["$HOME/.colima/default/docker.sock"]
-  },
-  "environment": {
-    "deny_vars": [
-      "DOCKER_CONTEXT",
-      "DOCKER_CERT_PATH",
-      "DOCKER_TLS",
-      "DOCKER_TLS_VERIFY"
-    ],
-    "set_vars": {
-      "DOCKER_HOST": "unix://$HOME/.colima/default/docker.sock",
-      "DOCKER_CONFIG": "$HOME/.local/share/nono-docker-client",
-      "BUILDX_CONFIG": "$HOME/.local/share/nono-docker-client/buildx"
-    }
+    "bypass_protection": ["$WORKDIR/.git"]
   }
 }

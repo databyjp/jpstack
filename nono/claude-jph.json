@@ -1,5 +1,5 @@
 {
-  "extends": ["jph-default", "claude"],
+  "extends": ["jph-default", "jph-docker", "claude"],
   "meta": {
     "name": "claude-jph",
     "version": "",
