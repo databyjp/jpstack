@@ -11,7 +11,9 @@
       "$HOME/.plannotator",
       "$HOME/.worktrees/",
       "$HOME/.config/",
-      "$HOME/code"
+      "$HOME/code",
+      "$HOME/Documents/ObsidianVaults/jph-weaviate",
+      "$HOME/Documents/ObsidianVaults/WeaviateBrain26"
     ],
     "read": [
       "$WORKDIR/.git",
