@@ -19,6 +19,7 @@
       "$WORKDIR/.git",
       "$HOME/.local/share/mise/installs/node",
       "$HOME/.local/share/mise/installs/python",
+      "$HOME/.local/share/mise/installs/go",
       "$HOME/.worktrees"
     ],
     "allow_file": ["$HOME/.plannotator/config.json"],
