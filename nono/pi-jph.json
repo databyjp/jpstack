@@ -1,0 +1,17 @@
+{
+  "extends": ["jph-default", "jph-docker", "pi"],
+  "meta": {
+    "name": "pi-jph",
+    "version": "",
+    "description": "Pi sandbox with a mise-managed Node and Python runtimes",
+    "author": null
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.pi-lens"
+    ],
+    "read": [
+      "$HOME/.claude"
+    ]
+  }
+}

@@ -1,9 +1,8 @@
 {
-  "extends": ["pi"],
   "meta": {
-    "name": "pi-mise",
+    "name": "jph-docker",
     "version": "",
-    "description": "Pi sandbox with a mise-managed Node and Python runtimes",
+    "description": "JPH docker config for agents to be able to use Docker",
     "author": null
   },
   "filesystem": {

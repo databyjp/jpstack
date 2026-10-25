@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "name": "jph-default",
+    "version": "",
+    "description": "JPH default config; includes mise-managed Node and Python runtimes",
+    "author": null
+  },
+  "filesystem": {
+    "deny": ["$WORKDIR/.git"],
+    "allow": [
+      "$HOME/.plannotator",
+      "$HOME/.worktrees/",
+      "$HOME/.config/",
+      "$HOME/code",
+      "$HOME/Documents/ObsidianVaults/jph-weaviate",
+      "$HOME/Documents/ObsidianVaults/WeaviateBrain26"
+    ],
+    "read": [
+      "$WORKDIR/.git",
+      "$HOME/.local/share/mise/installs/node",
+      "$HOME/.local/share/mise/installs/python",
+      "$HOME/.local/share/mise/installs/go",
+      "$HOME/.worktrees"
+    ],
+    "allow_file": ["$HOME/.plannotator/config.json"],
+    "bypass_protection": ["$WORKDIR/.git"]
+  }
+}

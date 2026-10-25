@@ -1,0 +1,9 @@
+{
+  "extends": ["jph-default", "jph-docker", "claude"],
+  "meta": {
+    "name": "claude-jph",
+    "version": "",
+    "description": "Claude Code sandbox with a mise-managed Node and Python runtimes",
+    "author": null
+  }
+}
