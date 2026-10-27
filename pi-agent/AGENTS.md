@@ -39,16 +39,18 @@ retained artifacts and neither is clearly preferable.
 Host browsers cannot run inside the nono sandbox. Take page screenshots with Playwright in Docker:
 
 ```bash
-mkdir -p screenshots
+dir=~/code/scratch/agents/<short-description>-$(openssl rand -hex 3)
+mkdir -p "$dir"
 docker run --rm --init --ipc=host --user pwuser \
   --security-opt no-new-privileges \
-  -v "$PWD/screenshots:/out" \
+  -v "$dir:/out" \
   mcr.microsoft.com/playwright:v1.50.0-noble \
   npx -y playwright@1.50.0 screenshot --full-page <url> /out/<name>.png
 ```
 
-- Write screenshots under `~/code`. The Docker VM mounts only `~/code`. A folder mounted from anywhere else, including the scratchpad in `/private/tmp`, is empty inside the container, and the screenshot never reaches the host.
-- Mount only the output folder. Do not mount the project root or `$HOME`.
+- Write screenshots to your own folder under `~/code/scratch/agents/`, and give the user its path when you finish. The sandbox cannot delete files there; the user clears the folder.
+- Mount only folders under `~/code`. The Docker VM mounts only `~/code`. A folder mounted from anywhere else, including the scratchpad in `/private/tmp`, is empty inside the container, and the screenshot never reaches the host.
+- For a local HTML page, mount the folder containing the page read-only (`-v "$PWD/<dir>:/site:ro"`) and use a `file:///site/...` URL. Do not start a server on the host; the sandbox blocks binding ports. Mount only the folders the page needs, never the project root or `$HOME`.
 - Do not use Chrome, the Claude in Chrome extension, or a host browser with a real profile.
 
 ## Project documentation
