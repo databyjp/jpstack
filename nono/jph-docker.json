@@ -22,7 +22,7 @@
       "$HOME/.claude"
     ],
     "allow_file": ["$HOME/.plannotator/config.json"],
-    "unix_socket": ["$HOME/.colima/default/docker.sock"]
+    "unix_socket": ["$HOME/.colima/agents/docker.sock"]
   },
   "environment": {
     "deny_vars": [
@@ -32,7 +32,7 @@
       "DOCKER_TLS_VERIFY"
     ],
     "set_vars": {
-      "DOCKER_HOST": "unix://$HOME/.colima/default/docker.sock",
+      "DOCKER_HOST": "unix://$HOME/.colima/agents/docker.sock",
       "DOCKER_CONFIG": "$HOME/.local/share/nono-docker-client",
       "BUILDX_CONFIG": "$HOME/.local/share/nono-docker-client/buildx",
       "GH_CONFIG_DIR": "$HOME/.pi/gh"
