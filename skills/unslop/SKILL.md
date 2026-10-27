@@ -14,6 +14,7 @@ Revise the draft without changing its facts, intent, technical meaning, required
 - Cut sentences that do not help the reader act or understand. Delete "It is important to note that." Replace "In order to" with "To" and "due to the fact that" with "because."
 - Replace praise and mood with facts. Rewrite "This pivotal release showcases the team's groundbreaking work" to name the release, the change, and who made it.
 - Name mechanisms and measurements. Replace "SQL you can read" with "`.toSQL()` returns the exact string sent to the database." Replace "performance improved significantly" with the measured change.
+- Prefer a short example over a description of it. Replace "renames the parameter and threads it through the loader" with the three-line diff.
 - Name the source of attributed claims. Replace "Experts believe" or "Industry reports suggest" with a named source and citation. Delete the claim if no source is available.
 - Replace vague participial phrases with actions or results. Rewrite clauses built around "highlighting," "ensuring," "reflecting," "showcasing," or "fostering" so they state what happened.
 - Prefer plain verbs and words when they preserve meaning. Replace "serves as" with "is," "utilize" with "use," and "facilitate" with "help." Keep established technical terms when a simpler word would be less precise.

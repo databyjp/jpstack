@@ -6,6 +6,8 @@ Apply these rules to human-facing prose. Preserve exact quotations, identifiers,
 - Delete canned closings such as "I hope this helps!" and "Let me know if you need anything else."
 - State the fact instead of praising it. Replace "a pivotal moment" or "a testament to the team" with what happened and who did it.
 - Name mechanisms and measurements instead of feelings. Replace "SQL you can read" with "`.toSQL()` returns the exact string sent to the database." Replace "types that follow your schema" with "a column rename fails the build."
+- Prefer a short example over a description of it. Replace "renames the parameter and threads it through the loader" with the three-line diff.
+- Write each sentence around what the reader can see or do next. Replace "A finding indicts an artifact: class + answer_source-derived doc + transcript-linked evidence. The leaf is a defect writeup, not a red cell." with "When the report surfaces a failure, it should name the thing someone has to go fix, not just show a red cell." Expand or cut a term defined only in your working context, and move "+"-notation field lists to the code or schema they describe.
 - Name the source of a claim. Replace "Experts believe" or "Industry reports suggest" with the source's name and citation. Delete the claim if no source is available.
 - Rewrite vague participial phrases such as "highlighting," "ensuring," "reflecting," "showcasing," and "fostering" as specific actions or results.
 - Prefer plain verbs. Replace "serves as" with "is," "boasts" with "has," "utilize" with "use," and "facilitate" with "help."

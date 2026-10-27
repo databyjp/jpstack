@@ -1,6 +1,6 @@
 ---
 name: show-me
-description: Help the user understand the current topic visually with concise diagrams, code-shape sketches, and focused HTML artifacts.
+description: Show the current topic, a proposed change, or a finished change visually with concise diagrams, code-shape sketches, diffs, and focused HTML artifacts. Use when explaining a topic, proposing a design or code change, or reporting completed work.
 ---
 
 Help the user understand the current topic of conversation visually. Skip the preamble and keep prose brief. Pick the smallest view that makes the key point clear.

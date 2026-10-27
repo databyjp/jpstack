@@ -73,8 +73,10 @@ constrain later work, and can be discarded without substantial rework. Git
 reversibility alone does not satisfy this test.
 
 A decision packet contains the decision, recommendation, main trade-off, and one
-question. Ask the user for concrete choices without repeating settled background.
-Clarification is not implementation approval.
+question. When the decision concerns an interface, schema, or code shape, present
+the candidates as short side-by-side code sketches using the `show-me` shapes,
+not prose descriptions. Ask the user for concrete choices without repeating
+settled background. Clarification is not implementation approval.
 
 ## Product contract
 
