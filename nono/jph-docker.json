@@ -34,12 +34,8 @@
     "set_vars": {
       "DOCKER_HOST": "unix://$HOME/.colima/agents/docker.sock",
       "DOCKER_CONFIG": "$HOME/.local/share/nono-docker-client",
-      "BUILDX_CONFIG": "$HOME/.local/share/nono-docker-client/buildx",
-      "GH_CONFIG_DIR": "$HOME/.pi/gh"
+      "BUILDX_CONFIG": "$HOME/.local/share/nono-docker-client/buildx"
     }
-  },
-  "network": {
-    "credentials": ["github"]
   },
   "security": {
     "ipc_mode": "full"

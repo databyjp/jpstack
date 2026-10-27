@@ -34,6 +34,23 @@ or a narrow executable checkpoint would resolve the uncertainty more directly.
 Ask only when the approaches have materially different cost, review cadence, or
 retained artifacts and neither is clearly preferable.
 
+## Browser screenshots
+
+Host browsers cannot run inside the nono sandbox. Take page screenshots with Playwright in Docker:
+
+```bash
+mkdir -p screenshots
+docker run --rm --init --ipc=host --user pwuser \
+  --security-opt no-new-privileges \
+  -v "$PWD/screenshots:/out" \
+  mcr.microsoft.com/playwright:v1.50.0-noble \
+  npx -y playwright@1.50.0 screenshot --full-page <url> /out/<name>.png
+```
+
+- Write screenshots under `~/code`. The Docker VM mounts only `~/code`. A folder mounted from anywhere else, including the scratchpad in `/private/tmp`, is empty inside the container, and the screenshot never reaches the host.
+- Mount only the output folder. Do not mount the project root or `$HOME`.
+- Do not use Chrome, the Claude in Chrome extension, or a host browser with a real profile.
+
 ## Project documentation
 
 Keep documentation accurate, durable, and easy to navigate for humans and agents.
