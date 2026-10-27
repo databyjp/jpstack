@@ -25,6 +25,7 @@ Apply these rules to human-facing prose. Preserve exact quotations, identifiers,
 - Replace generic conclusions with facts or plans. Delete "The future looks bright" unless the sentence names a specific result or next step.
 - Prefer concrete technical language over abstract metaphors. Replace "substrate" with "base," "wedge in" with "add," "gold-plating" with "more than the job needs," and "endgame" with "last phase" when those replacements preserve the technical meaning.
 - Prefer active voice when the actor matters. Replace "queries are validated" with "the compiler validates queries" and "the file is parsed by the loader" with "the loader parses the file."
+- Phrase actionable instructions as imperatives. Use declarative sentences for definitions, facts, and rationale. Replace "Comments are not records of the development session" with "Do not use comments to record the development session."
 - Replace unsupported adverbs with evidence. Replace "significantly improves" with the measured change. Keep adverbs that carry technical meaning.
 - Split a sentence when the reader must backtrack to parse it. Keep one main idea per sentence.
 - Before sending, remove any sentence that adds no fact, decision, instruction, example, or necessary context. If a sentence could appear unchanged in another project's documentation, check whether it says anything about this project.
