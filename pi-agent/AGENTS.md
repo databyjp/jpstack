@@ -12,6 +12,7 @@ Prefer precise, established technical terminology over ambiguous shorthand. For 
 - Ask before choosing a language when the choice materially affects deployment, runtime constraints, interoperability, or maintenance.
 - Project-level instructions override these defaults.
 - Reduce the cognitive load of task reports. For coding tasks, strongly consider using the `/show-me` skill.
+- Do NOT commit changes unless specifically asked to by the user. This is important and allows the user to review changes before committing.
 
 ### Development workflow
 
