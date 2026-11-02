@@ -26,6 +26,7 @@
     "bypass_protection": ["$WORKDIR/.git"]
   },
   "network": {
+    "listen_port": [19432],
     "credentials": ["github"],
     "custom_credentials": {
       "github": {
@@ -36,7 +37,14 @@
       }
     }
   },
+  "environment": {
+    "set_vars": { "PLANNOTATOR_PORT": "19432" }
+  },
   "credential_capture": {
-    "github": { "command": ["gh", "auth", "token"], "timeout_secs": 5, "cache_ttl_secs": 900 }
+    "github": {
+      "command": ["gh", "auth", "token"],
+      "timeout_secs": 5,
+      "cache_ttl_secs": 900
+    }
   }
 }
