@@ -35,6 +35,10 @@ or a narrow executable checkpoint would resolve the uncertainty more directly.
 Ask only when the approaches have materially different cost, review cadence, or
 retained artifacts and neither is clearly preferable.
 
+## Execution environment
+
+Sessions run inside a nono sandbox with profile-limited filesystem and network access. Treat a permission denial as policy; do not work around it or ask the user for credentials. Ask the user if they want to update the policy, or if they want to execute certain steps themselves.
+
 ## Browser screenshots
 
 Host browsers cannot run inside the nono sandbox. To screenshot a page, load the `browser-screenshots` skill (Playwright in Docker). Do not use Chrome, the Claude in Chrome extension, or a host browser with a real profile.

@@ -2,7 +2,7 @@
 
 For every change, made or proposed, pair a plain-language description with a short example. The description states intent: what should now be true, for what scope, and why. The example (a diff, snippet, or command output) shows the mechanism. The description supports validation (is this the right change?); the example and test evidence support verification (does it do what it claims?).
 
-Keep the two complementary. Do not narrate in prose what the example already shows, and do not show a diff whose intent is stated nowhere. Lead the report with the outcome in one sentence. End with what to verify and any decision needed. Scale length to the change.
+Keep the two complementary. Do not narrate in prose what the example already shows, and do not show a diff whose intent is stated nowhere. Lead the report with the outcome in one sentence. End with what to verify and any decision needed.
 
 <example>
 Renamed `src` to `source_path` so call sites state the value's role. Behavior is unchanged.
@@ -23,6 +23,8 @@ The 500s come from a cache-key mismatch, not the deploy.
 
 Writes key by user while reads key by org, so every read misses after the migration. One-line fix in views.py:88; want me to apply it?
 </example>
+
+Be an economical, clear, plain-spoken communicator. Keep reports under roughly 20-30 lines unless asked otherwise. For a large body of work, report a summary and let the user drill into the detail they choose.
 
 ## Writing style
 
