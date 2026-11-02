@@ -37,22 +37,7 @@ retained artifacts and neither is clearly preferable.
 
 ## Browser screenshots
 
-Host browsers cannot run inside the nono sandbox. Take page screenshots with Playwright in Docker:
-
-```bash
-dir=~/code/scratch/agents/<short-description>-$(openssl rand -hex 3)
-mkdir -p "$dir"
-docker run --rm --init --ipc=host --user pwuser \
-  --security-opt no-new-privileges \
-  -v "$dir:/out" \
-  mcr.microsoft.com/playwright:v1.50.0-noble \
-  npx -y playwright@1.50.0 screenshot --full-page <url> /out/<name>.png
-```
-
-- Write screenshots to your own folder under `~/code/scratch/agents/`, and give the user its path when you finish. The sandbox cannot delete files there; the user clears the folder.
-- Mount only folders under `~/code`. The Docker VM mounts only `~/code`. A folder mounted from anywhere else, including the scratchpad in `/private/tmp`, is empty inside the container, and the screenshot never reaches the host.
-- For a local HTML page, mount the folder containing the page read-only (`-v "$PWD/<dir>:/site:ro"`) and use a `file:///site/...` URL. Do not start a server on the host; the sandbox blocks binding ports. Mount only the folders the page needs, never the project root or `$HOME`.
-- Do not use Chrome, the Claude in Chrome extension, or a host browser with a real profile.
+Host browsers cannot run inside the nono sandbox. To screenshot a page, load the `browser-screenshots` skill (Playwright in Docker). Do not use Chrome, the Claude in Chrome extension, or a host browser with a real profile.
 
 ## Project documentation
 
@@ -104,31 +89,8 @@ In tests, favor local readability over deduplication when abstraction would sepa
 ### Name parameters by semantic role
 
 Prefer parameter names that state each value's role at the interface. Make each keyword argument understandable without opening the
-callee. Distinguish categories from instances, declaring files from authored or resolved paths, and classes from instances.
-
-Rather than:
-
-```python
-def load_resource(
-    *,
-    resource: str,
-    source: Path,
-    reference: Path,
-    model: type[BaseModel],
-) -> BaseModel: ...
-```
-
-Prefer:
-
-```python
-def load_resource(
-    *,
-    resource_kind: str,             # "AgentConfig", not a resource instance
-    declaring_file: Path,           # file containing the reference
-    declared_resource_path: Path,   # path as authored, before resolution
-    model_type: type[BaseModel],     # class used to validate the file
-) -> BaseModel: ...
-```
+callee. Distinguish categories from instances, declaring files from authored or resolved paths, and classes from instances. Rather than
+`load_resource(resource, source, reference, model)`, prefer `load_resource(resource_kind, declaring_file, declared_resource_path, model_type)`.
 
 Use the same terminology across producer parameters, exception attributes, and serialized output. Treat JSON field names as public
 interfaces.

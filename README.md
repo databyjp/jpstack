@@ -17,6 +17,35 @@ The script manages these symlinks:
 
 It leaves `~/.pi/agent/settings.json` unchanged. It replaces stale symlinks but refuses to replace regular files or directories.
 
+## Instruction file placement
+
+Pi assembles its system prompt in this order: core prompt, then `APPEND_SYSTEM.md` (the `addendum` section), then every discovered AGENTS.md (`project_context`), then skills, then cwd. Both files sit inside the system prompt; they differ in merge behavior:
+
+- AGENTS.md files are cumulative. The global `~/.pi/agent/AGENTS.md` loads first, then each ancestor of cwd.
+- Pi uses exactly one APPEND_SYSTEM.md. A trusted project's `.pi/APPEND_SYSTEM.md` replaces the global file, so rules that must hold in every project belong in AGENTS.md or in tooling (hooks, permission rules), not here.
+
+Split content accordingly: APPEND_SYSTEM.md holds always-on behavioral policy (task report format, writing style, editing discipline); AGENTS.md holds task-gated working knowledge (skill triggers, workflow, documentation and code style guidelines).
+
+## Claude Code
+
+`~/.claude/CLAUDE.md` imports both files:
+
+```
+@~/code/agents/jpstack/pi-agent/AGENTS.md
+@~/code/agents/jpstack/pi-agent/APPEND_SYSTEM.md
+```
+
+Claude Code delivers CLAUDE.md content as a user message after the system prompt, not inside it ([memory docs](https://code.claude.com/docs/en/memory)). For true system-prompt placement of the APPEND_SYSTEM.md rules, wrap `claude` in `~/.zshrc` and remove that import from `~/.claude/CLAUDE.md` so the file does not load twice:
+
+```shell
+claude() {
+    command claude --append-system-prompt-file \
+        ~/code/agents/jpstack/pi-agent/APPEND_SYSTEM.md "$@"
+}
+```
+
+Claude Code loads skills from `~/.claude/skills/`, which holds copies, not symlinks to `skills/` here. After changing a skill in this repository, copy it there.
+
 ## Sandbox
 
 Install [Nono](https://github.com/nolabs-ai/nono), then install or update the tracked profile through Nono's draft workflow:
