@@ -9,9 +9,7 @@
   "filesystem": {
     "allow": [
       "$HOME/.pi-lens"
-    ],
-    "read": [
-      "$HOME/.claude"
     ]
-  }
+  },
+  "network": { "credentials": ["gh_cli"] }
 }

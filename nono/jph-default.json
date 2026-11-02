@@ -6,11 +6,9 @@
     "author": null
   },
   "filesystem": {
-    "deny": ["$WORKDIR/.git"],
     "allow": [
       "$HOME/.plannotator",
       "$HOME/.worktrees/",
-      "$HOME/.config/",
       "$HOME/code",
       "$HOME/Documents/ObsidianVaults/jph-weaviate",
       "$HOME/Documents/ObsidianVaults/WeaviateBrain26"
@@ -20,18 +18,18 @@
       "$HOME/.local/share/mise/installs/node",
       "$HOME/.local/share/mise/installs/python",
       "$HOME/.local/share/mise/installs/go",
-      "$HOME/.worktrees"
-    ],
-    "allow_file": ["$HOME/.plannotator/config.json"],
-    "bypass_protection": ["$WORKDIR/.git"]
+      "$HOME/.claude",
+      "$HOME/.codex",
+      "$HOME/.config/pi"
+    ]
   },
   "network": {
     "listen_port": [19432],
-    "credentials": ["github"],
+    "credentials": ["gh_cli"],
     "custom_credentials": {
-      "github": {
+      "gh_cli": {
         "upstream": "https://api.github.com",
-        "credential_key": "cmd://github",
+        "credential_key": "cmd://gh_cli",
         "env_var": "GH_TOKEN",
         "credential_format": "token {}"
       }
@@ -41,7 +39,7 @@
     "set_vars": { "PLANNOTATOR_PORT": "19432" }
   },
   "credential_capture": {
-    "github": {
+    "gh_cli": {
       "command": ["gh", "auth", "token"],
       "timeout_secs": 5,
       "cache_ttl_secs": 900
