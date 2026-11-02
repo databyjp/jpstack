@@ -1,15 +1,14 @@
 {
-  "extends": ["jph-default", "jph-docker", "pi"],
+  "extends": ["jph-default", "jph-docker", "pi", "claude"],
   "meta": {
     "name": "pi-jph",
     "version": "",
-    "description": "Pi sandbox with a mise-managed Node and Python runtimes",
+    "description": "Pi sandbox with a mise-managed Node and Python runtimes; ",
     "author": null
   },
   "filesystem": {
-    "allow": [
-      "$HOME/.pi-lens"
-    ]
+    "allow": ["$HOME/.pi-lens"],
+    "read": ["$HOME/.cmuxterm/cmux-cli-shims"]
   },
   "network": { "credentials": ["gh_cli"] }
 }
