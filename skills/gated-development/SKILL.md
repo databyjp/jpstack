@@ -298,6 +298,11 @@ uncertainty.
 
 ## Review report
 
+Treat the reporting requirements below as coverage checks, not mandatory headings.
+Keep detailed checkpoint and evidence records available; summarize related results
+and reference those records rather than repeating them. Keep approval conditions,
+failures, and unverified behavior explicit in the reader-facing summary.
+
 Use `jp-coding-preferences-reporting`. In addition, compare approved and actual
 files and review surface, report each primary assertion as passed, failed, or
 unverified, map new evidence to the Product contract, name must-have behavior

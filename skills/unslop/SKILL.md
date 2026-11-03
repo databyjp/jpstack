@@ -5,11 +5,14 @@ description: Reviews and revises substantial human-facing prose for concision, s
 
 # Unslop
 
-Revise the draft without changing its facts, intent, technical meaning, required format, or requested voice. Reread it as its intended reader, without your working context, and rewrite violations rather than flagging them.
+Revise the draft without changing its facts, intent, technical meaning, required format, or requested voice. Reread it as its intended reader, without your working context, and rewrite violations rather than flagging them. Reduce reading effort, not just word count.
 
 ## Revision pass
 
 - Start with the answer or necessary context. Delete openings such as "Of course!", "Great question!", and "You're absolutely right!"
+- Keep complete sentences when fragments obscure the subject, timing, or consequence. Replace "No paid runs; no retained log edited" with "This work uses existing results only. It will not launch paid Trials. Existing retained logs will remain unchanged."
+- Separate the current state, proposed change, rationale, and constraints when combining them makes a sentence difficult to follow.
+- Make clear whether a statement describes existing behavior, proposed behavior, or completed work. State the document's status once, then use consistent wording: "The report currently reads notes from..." versus "The report would read records from...".
 - Phrase actionable instructions as imperatives. Use declarative sentences for definitions, facts, and rationale. Replace "Comments are not records of the development session" with "Do not use comments to record the development session."
 - Cut sentences that do not help the reader act or understand. Delete "It is important to note that." Replace "In order to" with "To" and "due to the fact that" with "because."
 - Replace praise and mood with facts. Rewrite "This pivotal release showcases the team's groundbreaking work" to name the release, the change, and who made it.
@@ -31,6 +34,7 @@ Revise the draft without changing its facts, intent, technical meaning, required
 
 ## Final check
 
+- Can the intended reader understand the explanation without the writer's working context and distinguish facts from proposals?
 - Does every sentence add a fact, decision, instruction, example, or necessary context?
 - Could any sentence appear unchanged in another project's documentation? If so, make it specific or delete it.
 - Are claims tied to evidence or a named source?

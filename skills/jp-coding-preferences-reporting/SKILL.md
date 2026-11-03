@@ -5,7 +5,7 @@ description: Use when reporting finished code changes back to the user, so they 
 
 # Reporting changes
 
-Report Scope, Changed, Not changed, Validation, and Follow-ups. Then guide the review:
+Cover scope, changes, relevant unchanged behavior, validation, and any follow-ups. Treat these as coverage checks, not mandatory headings; omit inapplicable categories. Explain each point once and group related changes under one representative example. Then guide the review:
 
 - **Give a reading order, not a file list.** Order by consequence, and name the
   question each file answers. The safety-critical seam comes before the file of
