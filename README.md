@@ -110,4 +110,16 @@ colima start agents
 
 Stop it with `colima stop agents`.
 
+The VM's mounts are set in `~/.colima/agents/colima.yaml`.
+
+```yaml
+mounts:
+  - location: ~/code
+    writable: true
+  - location: ~/.claude/tmp   # Claude Code scratchpads
+    writable: true
+```
+
+A non-empty `mounts` list replaces Colima's default read-only mount of `~`. Note containers get full read, write, and delete access to mounted paths, regardless of nono's rules.
+
 The `jph-docker` nono profile connects sandboxed agents to this VM. It sets `DOCKER_HOST` to `unix://~/.colima/agents/docker.sock` and `DOCKER_CONFIG` to the client directory above, grants the sandbox that one unix socket and nothing else under `~/.colima`, and denies `DOCKER_CONTEXT` and `DOCKER_TLS*` so an agent cannot retarget another daemon. Verify from inside a sandboxed session with `docker info`.
