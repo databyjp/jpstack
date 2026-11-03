@@ -425,3 +425,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Eval output Claude Code writes into linked skills
+skills/*/evals/

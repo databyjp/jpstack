@@ -14,8 +14,11 @@ The script manages these symlinks:
 - `pi-agent/APPEND_SYSTEM.md` to `~/.pi/agent/APPEND_SYSTEM.md`
 - Each directory in `pi-extensions/` to `~/.pi/agent/extensions/`
 - `skills/` to `~/.agents/skills`
+- Each skill directory in `skills/` (one holding a `SKILL.md`) to `~/.claude/skills/<name>`, so Claude Code reads the same files as Pi. Claude's own entries there (`synced/`, `.trash/`) are left alone.
 
-It leaves `~/.pi/agent/settings.json` unchanged. It replaces stale symlinks but refuses to replace regular files or directories.
+It leaves `~/.pi/agent/settings.json` unchanged and replaces stale symlinks. Where a target is a regular file or directory, an interactive run asks about each one; a confirmed target is moved to a `.trash/` directory beside it before the link is made. `--yes` confirms them all; a non-interactive run without `--yes` refuses before changing anything.
+
+Claude Code may write eval output into a linked skill (`skills/<name>/evals/`), which `.gitignore` excludes.
 
 ## Instruction file placement
 
@@ -44,7 +47,7 @@ claude() {
 }
 ```
 
-Claude Code loads skills from `~/.claude/skills/`, which holds copies, not symlinks to `skills/` here. After changing a skill in this repository, copy it there.
+Claude Code loads skills from `~/.claude/skills/`; `add_symlinks.py apply` links each skill there, so a change in `skills/` reaches Claude Code and Pi alike.
 
 ## Sandbox
 

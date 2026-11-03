@@ -59,6 +59,55 @@ class AddSymlinksCliTests(unittest.TestCase):
                 target.resolve(), (REPO_ROOT / "pi-agent/AGENTS.md").resolve()
             )
 
+    def test_apply_links_each_skill_into_claude_skills(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            result = self.run_script(home)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            target = home / ".claude/skills/show-me"
+            self.assertTrue(target.is_symlink())
+            self.assertEqual(target.resolve(), (REPO_ROOT / "skills/show-me").resolve())
+            # Only directories holding a SKILL.md are skills; skills/synced is not.
+            self.assertFalse((home / ".claude/skills/synced").exists())
+
+    def test_apply_with_yes_moves_conflicts_to_trash_and_links(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            target = home / ".claude/skills/show-me"
+            target.mkdir(parents=True)
+            (target / "SKILL.md").write_text("stale copy")
+            sibling = home / ".claude/skills/synced"
+            sibling.mkdir()
+
+            result = self.run_script(home, "--yes")
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(target.is_symlink())
+            trashed = list((home / ".claude/skills/.trash").glob("show-me-*"))
+            self.assertEqual(len(trashed), 1)
+            self.assertEqual((trashed[0] / "SKILL.md").read_text(), "stale copy")
+            self.assertTrue(sibling.is_dir() and not sibling.is_symlink())
+
+    def test_apply_asks_per_conflict_and_keeps_declined_targets(self) -> None:
+        sys.path.insert(0, str(REPO_ROOT))
+        import add_symlinks
+
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            keep = home / ".claude/skills/show-me"
+            replace = home / ".claude/skills/unslop"
+            for target in (keep, replace):
+                target.mkdir(parents=True)
+                (target / "SKILL.md").write_text("stale copy")
+            answers = {keep: False, replace: True}
+
+            kept = add_symlinks.apply(home, lambda source, target: answers[target])
+
+            self.assertEqual(kept, 1)
+            self.assertTrue(keep.is_dir() and not keep.is_symlink())
+            self.assertTrue(replace.is_symlink())
+
     def test_apply_refuses_non_symlink_conflicts_before_making_changes(self) -> None:
         for conflict_kind in ("file", "directory"):
             with (
@@ -84,11 +133,11 @@ class AddSymlinksCliTests(unittest.TestCase):
                 else:
                     self.assertEqual((target / "keep-me").read_text(), "keep me")
 
-    def run_script(self, home: Path) -> subprocess.CompletedProcess[str]:
+    def run_script(self, home: Path, *flags: str) -> subprocess.CompletedProcess[str]:
         environment = os.environ.copy()
         environment["HOME"] = str(home)
         return subprocess.run(
-            [sys.executable, str(ADD_SYMLINKS), "apply"],
+            [sys.executable, str(ADD_SYMLINKS), "apply", *flags],
             cwd=REPO_ROOT,
             env=environment,
             capture_output=True,
