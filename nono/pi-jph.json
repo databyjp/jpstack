@@ -9,6 +9,5 @@
   "filesystem": {
     "allow": ["$HOME/.pi-lens"],
     "read": ["$HOME/.cmuxterm/cmux-cli-shims"]
-  },
-  "network": { "credentials": ["gh_cli"] }
+  }
 }
