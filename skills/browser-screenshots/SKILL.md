@@ -18,6 +18,6 @@ docker run --rm --init --ipc=host --user pwuser \
 ```
 
 - Write screenshots to your own folder under `~/code/scratch/agents/`, and give the user its path when you finish. The sandbox cannot delete files there; the user clears the folder.
-- Mount only folders under `~/code`. The Docker VM mounts only `~/code`. A folder mounted from anywhere else, including the scratchpad in `/private/tmp`, is empty inside the container, and the screenshot never reaches the host.
+- Mount only folders under `~/code` or `~/.claude/tmp` (Claude Code scratchpads). The Docker VM mounts only those two paths. A folder mounted from anywhere else, including `/private/tmp`, is empty inside the container, and the screenshot never reaches the host.
 - For a local HTML page, mount the folder containing the page read-only (`-v "$PWD/<dir>:/site:ro"`) and use a `file:///site/...` URL. Do not start a server on the host; the sandbox blocks binding ports. Mount only the folders the page needs, never the project root or `$HOME`.
 - Do not use Chrome, the Claude in Chrome extension, or a host browser with a real profile.
