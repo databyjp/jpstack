@@ -300,7 +300,9 @@ uncertainty.
 
 Treat the reporting requirements below as coverage checks, not mandatory headings.
 Keep detailed checkpoint and evidence records available; summarize related results
-and reference those records rather than repeating them. Keep approval conditions,
+and reference those records rather than repeating them. Use a compact table or
+ledger for checkpoint status, file-surface comparison, and budgets so the prose
+focuses on reading order, risks, and decisions. Keep approval conditions,
 failures, and unverified behavior explicit in the reader-facing summary.
 
 Use `jp-coding-preferences-reporting`. In addition, compare approved and actual

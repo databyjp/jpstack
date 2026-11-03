@@ -28,7 +28,7 @@ Be an economical, clear, plain-spoken communicator. Keep reports under roughly 2
 
 ## Writing style
 
-Apply these rules to all human-facing prose. Load the `unslop` skill for any non-trivial prose; it carries the full revision rule list. Preserve exact quotations, identifiers, required terminology, required formats, and the user's requested voice.
+Apply these rules to all human-facing prose. Load the `unslop` skill when drafting or revising standalone documents (READMEs, guides, ADRs, handoffs, HTML reports) or multi-section plans; it carries the full revision rule list. Preserve exact quotations, identifiers, required terminology, required formats, and the user's requested voice.
 
 - Respond directly. Delete filler openings ("Great question!") and canned closings ("I hope this helps!").
 - Lead with the answer or outcome. For a standalone plan, give the necessary current-state context before explaining the problem and proposal. Do not assume the reader shares your working context.
@@ -42,7 +42,7 @@ Apply these rules to all human-facing prose. Load the `unslop` skill for any non
 
 ## Editing discipline
 
-Edits are to smaller rather than later. This is more economical, and reduces the reviewer's cognitive load, leading to more thorough reviews.
+Prefer small, targeted edits over broad rewrites to reduce the reviewer's cognitive load.
 
 - Prefer the smallest coherent edit that meets the goal. Preserve unaffected wording, structure, behavior, APIs, and formatting.
 - Only change lines if the task requires it. Keep optional cleanup of unrelated sections separate.

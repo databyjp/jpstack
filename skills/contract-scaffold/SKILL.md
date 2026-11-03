@@ -75,7 +75,8 @@ change, stop under `gated-development` rather than weakening the scaffold.
 ## Stop and report
 
 Stop before behavior implementation. Add tests only when the approved scaffold
-contract includes them. Report:
+contract includes them. Treat the items below as coverage checks, not mandatory
+headings, and omit inapplicable categories:
 
 1. a consequence-ordered reading order;
 2. proposed interface and seam decisions;

@@ -10,7 +10,7 @@ Cover scope, changes, relevant unchanged behavior, validation, and any follow-up
 - **Give a reading order, not a file list.** Order by consequence, and name the
   question each file answers. The safety-critical seam comes before the file of
   one-line error classes.
-- **Show the change, don't describe it.** For anything the reviewer must approve
+- **State the intent in prose; show the mechanism in code.** For anything the reviewer must approve
   or might dispute, such as a public interface, schema, error handling, or a
   deletion, include the signature or a 3-15 line hunk inline using the `show-me`
   diff shapes, and reference the rest as `file:line`. Do not re-paste diffs the
