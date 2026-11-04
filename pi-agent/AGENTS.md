@@ -1,20 +1,3 @@
-# About me
-
-I work at Weaviate as a Developer Experience (DX) and Agent Experience (AX) engineer.
-
-That primarily spans client SDKs, AX evals, and some other adjacent activities such as docs and helping with devrel content.
-
-## Where my files are
-
-| Location | Contents |
-| --- | --- |
-| `~/code` | General coding workspace |
-| `~/code/weaviate/` | Weaviate repos: `weaviate` (core), `docs`, `weaviate-python-client`, `weaviate-go-client`, `weaviate-academy`, `weaviate-cloud`, `weaviate-io` (website) and more |
-| `~/code/agents/jpstack/` | My personal agent tooling and setup: skills, nono sandbox definitions, Pi config (`pi-agent/`), symlinked into `~/.pi/agent/`, `~/.agents/skills/`, and `~/.claude/` |
-| `~/code/weval/` | An AX evaluation harness that I am building |
-| `~/code/scratch/` | Throwaway experiments |
-| `~/code/sandpit/` | Another throwaway experiments, usually weaviate-relate code |
-
 # Language
 
 Load the `unslop` skill when drafting or revising standalone documents (READMEs, guides, ADRs, handoffs, HTML reports) or multi-section plans.
