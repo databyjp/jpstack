@@ -10,6 +10,7 @@
       "$HOME/.plannotator",
       "$HOME/.worktrees/",
       "$HOME/code",
+      "$HOME/go/pkg",
       "$HOME/Documents/ObsidianVaults/jph-weaviate",
       "$HOME/Documents/ObsidianVaults/WeaviateBrain26"
     ],
