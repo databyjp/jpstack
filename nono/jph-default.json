@@ -17,6 +17,7 @@
     ],
     "read": [
       "$HOME/.local/share/mise",
+      "$HOME/.config/mise",
       "$HOME/.config/gh",
       "$HOME/.agents/",
       "$HOME/.claude",
