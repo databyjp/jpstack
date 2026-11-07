@@ -16,9 +16,7 @@
       "$HOME/Documents/ObsidianVaults/WeaviateBrain26"
     ],
     "read": [
-      "$HOME/.local/share/mise/installs/node",
-      "$HOME/.local/share/mise/installs/python",
-      "$HOME/.local/share/mise/installs/go",
+      "$HOME/.local/share/mise",
       "$HOME/.config/gh",
       "$HOME/.agents/",
       "$HOME/.claude",
