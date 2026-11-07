@@ -1,22 +1,19 @@
 {
   "packages": [
-    "npm:@agnishc/edb-session-manager",
-    "npm:@plannotator/pi-extension",
-    {
-      "source": "/Users/jphwang/.config/nono/packages/always-further/pi"
-    },
-    "npm:pi-web-access",
-    "npm:@juicesharp/rpiv-todo",
-    "npm:pi-lens",
-    "npm:pi-calm",
-    "npm:@narumitw/pi-worktree",
     {
       "source": "/Users/jphwang/.config/nono/packages/nolabs-ai/pi"
     },
+    "npm:@plannotator/pi-extension",
+    "npm:pi-web-access",
+    "npm:pi-lens",
+    "npm:pi-calm",
+    "npm:pi-subagents",
+    "https://github.com/earendil-works/pi-claude-code",
+    "npm:@narumitw/pi-worktree",
     "npm:pi-langfuse"
   ],
-  "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
-  "theme": "dark"
+  "theme": "dark",
+  "defaultThinkingLevel": "high"
 }
