@@ -1,5 +1,5 @@
 {
-  "extends": ["jph-default", "jph-docker", "claude"],
+  "extends": ["jph-default", "jph-docker", "nolabs-ai/claude"],
   "meta": {
     "name": "claude-jph",
     "version": "",
