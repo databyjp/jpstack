@@ -20,6 +20,7 @@
       "$HOME/.local/share/mise/installs/python",
       "$HOME/.local/share/mise/installs/go",
       "$HOME/.config/gh",
+      "$HOME/.agents/",
       "$HOME/.claude",
       "$HOME/.codex"
     ]
