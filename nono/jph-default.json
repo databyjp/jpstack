@@ -10,6 +10,7 @@
       "$HOME/.plannotator",
       "$HOME/.worktrees/",
       "$HOME/.codegraph/",
+      "$HOME/.local/state/mise/",
       "$HOME/code",
       "$HOME/go/pkg",
       "$HOME/Documents/ObsidianVaults/jph-weaviate",
