@@ -6,6 +6,8 @@ The cases address the communication problems discussed in [Zonder Labs' post](ht
 
 The [2026-11-11 subagent pilot](results/2026-11-11/README.md) records an initial comparison, a second instruction revision, and a check on independently authored cases. Its raw record includes frozen instruction text, generated responses, blind labels, and reviewer judgments.
 
+The [preference-guided follow-up](results/2026-11-11-preferences/README.md) compares that PR version with targeted and compact candidates after six human A/B choices. It records the selected compact guidance, all 21 responses, both blind reviews, and remaining questions about code/prose balance.
+
 ## Compare two instruction sets
 
 1. Save the baseline and candidate instruction files, their revisions or diffs, model identifier, and generation settings. Use the same model and settings for both. Keep unrelated system instructions identical.

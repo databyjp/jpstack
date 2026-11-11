@@ -1,6 +1,6 @@
 # Writing evaluation, 2026-11-11
 
-The working instructions are now **v3**, revised after 33 fresh subagent outputs, three rounds of blind model review, and one explicit user preference. The pilot found useful changes and residual weaknesses. It does not establish a repeatable improvement across models or tasks.
+This pilot selected **v3** after 33 fresh subagent outputs, three rounds of blind model review, and one explicit user preference. It found useful changes and residual weaknesses. It does not establish a repeatable improvement across models or tasks. Later changes are recorded in [the preference-guided follow-up](../2026-11-11-preferences/README.md).
 
 ## What changed
 
@@ -8,7 +8,7 @@ The working instructions are now **v3**, revised after 33 fresh subagent outputs
 - **v2** emphasized reader consequences, distinguished proposals from instructions, and narrowed risk-reduction claims. It improved the sampled report and plan, but its mandatory caller-first opening overreached.
 - **v3** removed that mandatory ordering after the user preferred a direct account of the change and its reason. It retains the proposal, evidence, and reporting improvements and allows the opening to follow the reader's task.
 
-The baseline is repository revision `f065b8b`. The initial revision prepared in the preceding conversation is v1. Frozen text and hashes for every version are in [run.json](run.json); the current files match the v3 snapshot.
+The baseline is repository revision `f065b8b`. The initial revision prepared in the preceding conversation is v1. Frozen text and hashes for every version are in [run.json](run.json); the selected files at the end of this pilot matched the v3 snapshot.
 
 ## Method
 
@@ -49,7 +49,7 @@ Both final reviewers preferred v3's sampled retry report under that calibration.
 - Cancellation explanations repeated the completion rule across an opening, race explanation, component walkthrough, and ending. The final version did not resolve this consistently.
 - The invoice case is now a calibration example, not evidence that v3 generalizes. Further testing should use new real outputs and several fresh generations per relevant case, including a preservation case.
 
-The working version is a candidate for the user's actual models. The next iteration should use human preferences on real stack outputs, retaining successful explanations as examples and keeping some cases out of the prompt-editing process.
+The selected version was a candidate for the user's actual models. Further iterations should use human preferences on real stack outputs, retaining successful explanations as examples and keeping some cases out of the prompt-editing process.
 
 ## Artifacts
 

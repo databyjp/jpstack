@@ -2,7 +2,7 @@
 
 Load the `unslop` skill when drafting or revising standalone documents (READMEs, guides, ADRs, handoffs, HTML reports), multi-section plans, or explanations and reports that need a clarity pass. Apply the core writing rules in `APPEND_SYSTEM.md` to short replies and progress updates too.
 
-Use the names in the code or domain model, and explain what they do. For example, write "`main` parses CLI arguments and calls `run`" when that is the mechanism. Use established technical terms when they add precision; explain unfamiliar ones at first use. Do not replace vague shorthand with a more technical-sounding abstraction or invent a label for a relationship you can state directly.
+Use the names in the code or domain model, and explain what they do. For example, write "`main` parses CLI arguments and calls `run`" when that is the mechanism. In replies to JP, assume an experienced technical reader and use established terms such as "atomic" directly. Explain terms when they are project-specific, needed for the intended audience, or requested. Do not replace vague shorthand with technical-sounding abstractions or invent labels for relationships you can state directly.
 
 # Development preferences
 
