@@ -1,32 +1,21 @@
 ---
 name: jp-coding-preferences-reporting
-description: Use when reporting finished code changes back to the user, so they can review them in a sensible order.
+description: Use when reporting finished code changes back to the user, so they can understand the result and review consequential changes in a sensible order.
 ---
 
 # Reporting changes
 
-Cover scope, changes, relevant unchanged behavior, validation, and any follow-ups. Treat these as coverage checks, not mandatory headings; omit inapplicable categories. Explain each point once and group related changes under one representative example. Then guide the review:
+Lead with what changed and what that means for the user. Explain the result in terms of actual behavior before introducing implementation detail. For example: "The importer now skips rows with invalid dates and reports their line numbers" tells the reader more than "Import validation has been hardened."
 
-- **Give a reading order, not a file list.** Order by consequence, and name the
-  question each file answers. The safety-critical seam comes before the file of
-  one-line error classes.
-- **State the intent in prose; show the mechanism in code.** For anything the reviewer must approve
-  or might dispute, such as a public interface, schema, error handling, or a
-  deletion, include the signature or a 3-15 line hunk inline using the `show-me`
-  diff shapes, and reference the rest as `file:line`. Do not re-paste diffs the
-  harness already rendered; excerpt only what needs a decision.
-- **Budget the excerpts.** Keep the report's excerpted code under roughly one
-  screen. Past that, trim excerpts before trimming the reading order.
-- **Indicate importance.** Mark architecture-critical or safety-critical parts.
-  Omit this when none exist.
-- **Name any significant risks.** If there is a weak assumption, unresolved risk, or
-  design choice, state it plainly. If you changed your mind during implementation,
-  say so. Do not invent a weakness or risk to fill this section.
-- **Say what to skip, and why.** "Every method body raises `NotImplementedError`,
-  so there is no logic to check" saves more time than a summary.
-- **Name the decision, when there is one.** Ask the reviewer to approve the shape,
-  approve the behaviour, or choose between options. Otherwise, state what was
-  validated and whether any follow-up remains.
+Prefer an opening that names the change and its reason, using first person for your own work: "I restricted retries to explicit rejections so a timeout cannot trigger an automatic resend." Then explain any new error, argument, or behavior the caller must handle. Put a release recommendation or other decision first when that is the reader's immediate task. Do not impose one opening structure on every report. Describe the specific failure path addressed; do not turn removal of one cause into a guarantee that a whole class of failures cannot occur.
 
-One real weakness beats four hedges. Omit the section when there is no credible
-weakness.
+Cover the relevant scope, changes, validation, risks, and remaining decisions. These are coverage checks, not headings or a requirement to fill every category. A small fix may need only a short paragraph and the check result. Keep connected reasoning in prose; use a list when the reader needs to compare independent changes or follow a review order.
+
+- **Give a reading order when it helps review.** Order consequential changes by the question each file answers, such as "Read `session.py` first to check when the old session closes; `test_session.py` exercises that sequence." Use names from the code and explain their role. Do not substitute labels such as "the safety-critical seam" for the behavior the reviewer needs to inspect.
+- **Explain intent; show mechanisms selectively.** For a public interface, schema, error handling, deletion, or other disputable choice, include a signature or 3-15 line excerpt when it helps assess that choice. Use the `show-me` diff shapes where appropriate and reference the rest as `file:line`. Do not repeat diffs the harness already rendered. Keep excerpts under roughly one screen and explain what the reader should notice.
+- **Connect checks to claims.** Say what was run, what passed or failed, and what behavior that checks. Distinguish completed edits from verified outcomes. Keep local measurements, suspected causes, and predictions separate. Name untested behavior when it limits the conclusion; do not imply that one passing test validates an entire workflow.
+- **Name consequential risks and decisions.** Explain the condition and consequence directly: "Retries may send an invoice twice because the provider does not accept an idempotency key." State an unresolved design choice or changed assumption when it affects review. Omit speculative risks, generic cautions, and routine implementation history.
+- **Mention unchanged behavior only when it matters.** Include it when the reader might reasonably expect it to change or when it limits the result. Say what can be skipped only when that saves meaningful review effort.
+- **End when the useful information ends.** Ask for a concrete decision when one remains. Otherwise, finish with the result or validation. Do not manufacture a follow-up, recap, approval request, or task for the user.
+
+Before sending, check that the reader can tell who does what and why it matters without reconstructing your development session. Apply the always-on writing rules; use `unslop` when the report needs a fuller clarity pass.

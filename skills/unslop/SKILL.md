@@ -1,41 +1,83 @@
 ---
 name: unslop
-description: Reviews and revises substantial human-facing prose for concision, specificity, and natural language. Use when writing prose such as long outputs, documents, or even code comments.
+description: Drafts and revises human-facing prose so readers can follow the actors, actions, relationships, and point. Use for substantial explanations, reports, documents, plans, or comments, and when asked to improve unclear writing.
 ---
 
 # Unslop
 
-Revise the draft without changing its facts, intent, technical meaning, required format, or requested voice. Reread it as its intended reader, without your working context, and rewrite violations rather than flagging them. Reduce reading effort, not just word count.
+Reduce the work the reader must do to understand the text. Preserve facts, intent, technical meaning, uncertainty, required format, and the requested voice. Clear writing may need more words. Do not turn a revision into a shorter but less informative claim.
 
-## Revision pass
+## Revision sequence
 
-- Start with the answer or necessary context. Delete openings such as "Of course!", "Great question!", and "You're absolutely right!"
-- Keep complete sentences when fragments obscure the subject, timing, or consequence. Replace "No paid runs; no retained log edited" with "This work uses existing results only. It will not launch paid Trials. Existing retained logs will remain unchanged."
-- Separate the current state, proposed change, rationale, and constraints when combining them makes a sentence difficult to follow.
-- Make clear whether a statement describes existing behavior, proposed behavior, or completed work. State the document's status once, then use consistent wording: "The report currently reads notes from..." versus "The report would read records from...".
-- Phrase actionable instructions as imperatives. Use declarative sentences for definitions, facts, and rationale. Replace "Comments are not records of the development session" with "Do not use comments to record the development session."
-- Cut sentences that do not help the reader act or understand. Delete "It is important to note that." Replace "In order to" with "To" and "due to the fact that" with "because."
-- Replace praise and mood with facts. Rewrite "This pivotal release showcases the team's groundbreaking work" to name the release, the change, and who made it.
-- Name mechanisms and measurements. Replace "SQL you can read" with "`.toSQL()` returns the exact string sent to the database." Replace "performance improved significantly" with the measured change.
-- Name the source of attributed claims. Replace "Experts believe" or "Industry reports suggest" with a named source and citation. Delete the claim if no source is available.
-- Write each sentence around what the reader can see or do next. Expand, ground, or cut any term the reader has not been given.
-- Replace vague participial phrases with actions or results. Rewrite clauses built around "highlighting," "ensuring," "reflecting," "showcasing," or "fostering" so they state what happened.
-- Prefer plain verbs and words when they preserve meaning. Replace "serves as" with "is," "utilize" with "use," and "facilitate" with "help." Keep established technical terms when a simpler word would be less precise.
-- Prefer concrete technical language over abstract metaphors. Replace "substrate" with "base" and "wedge in" with "add" when the replacement preserves the technical meaning.
-- Use one accurate qualifier. Replace "could potentially be" with "may."
-- Remove stock structures. State the point instead of writing "not just X, but Y." Do not invent a third item to make a group of three. Use "from X to Y" only when X and Y are endpoints on a meaningful scale.
-- Keep terminology stable. Do not call the same person "protagonist," "main character," "central figure," and "hero" in one passage.
-- Split sentences that require backtracking. Prefer "The loader parses the file. The compiler validates each query" to a sentence that buries both actions in subordinate clauses.
-- Prefer active voice when the actor matters. Replace "queries are validated" with "the compiler validates queries." Keep passive voice when the actor is unknown or irrelevant.
-- Use first person when reporting your own work. Write "I reduced 189 docstring lines to 125" rather than "189 docstring lines down to 125."
-- Remove formatting habits that do not aid navigation. Replace "**Performance:** Performance improved" with a direct sentence. "**Schema in TypeScript.** Tables live in one file." is acceptable because the second sentence adds information.
-- Use sentence-case headings, straight quotes, and no decorative emojis or em dashes. Use colons for lists or examples, not in place of a sentence break.
-- Delete canned endings such as "I hope this helps," "Let me know if you need anything else," and "The future looks bright." End with the result, decision, or next step.
+Work through these questions in order. Rewrite the draft rather than appending a critique or exposing the editing checklist, unless the user asks for one.
+
+### What does the reader need to learn?
+
+Identify the intended reader and the question the text should answer. Lead a reply with the answer, finding, or result. Give a standalone document enough current-state context to make its problem and proposal understandable.
+
+Distinguish existing behavior, proposed changes, and completed work. State a document's status once, then keep the tense consistent. Include background that explains a consequence or decision; remove the history of how the writer arrived there unless it changes the reader's judgment.
+
+Choose the main point by the reader's task. In a change report, a direct account of what changed and why is often the clearest opening; explain relevant caller consequences nearby. Do not impose a caller-first formula or split a clear change-and-reason sentence merely to make sentences shorter. Describe a proposal with wording such as "The service would load..."; reserve imperatives for actual instructions. Do not add implementation or verification tasks to an explanation unless they serve the request.
+
+### Who does what?
+
+Find the person, component, or process involved and the action it performs. Usually put that actor in the grammatical subject and the action in the verb. Look for actions hidden in nouns such as "validation," "coordination," or "execution"; restore the verb when doing so clarifies the sentence.
+
+Given that the queue dispatches jobs and retries failures:
+
+- Before: "Retry coordination is handled through the queue's ownership of dispatch."
+- After: "The queue dispatches jobs and retries failed jobs."
+
+Do not mechanically ban nouns or passive voice. "The token expires after ten minutes" names the right subject. "The backup was deleted at 09:00; the logs do not identify who deleted it" preserves an unknown actor. Never invent an actor to make a sentence active. Use first person for your own work and imperatives for instructions.
+
+### What exactly does this mean?
+
+Use the names in the code or domain model. Keep established technical terms when they add precision, and explain unfamiliar ones at first use. Keep terminology stable rather than rotating synonyms for variety.
+
+Unpack noun clusters into relationships: who calls what, which value changes, where data goes, or under what condition behavior occurs. Replace invented labels and decorative metaphors with those relationships. A familiar technical word can still be vague in an unfamiliar combination.
+
+Given a test of a server that closes the old session before assigning the new one:
+
+- Before: "The session ownership handoff seam now has cleanup coverage."
+- After: "The test checks that the server closes the old session before assigning the new one."
+
+Give pronouns an unmistakable referent. Replace "this fixes it" with the specific cause and effect when several things could be meant. Prefer plain words when they preserve meaning; do not replace precise terms with generic words such as "thing" or "handling."
+
+### Can the reader follow the point on one reading?
+
+Begin with something already introduced, then add the new information. Keep subjects close to their verbs, conditions close to the behavior they control, and causes close to their consequences. Split a sentence when qualifiers or nested clauses force the reader to backtrack. Keep a longer sentence when its relationships are easy to follow.
+
+Given that the cache holds a client, refresh keeps that client, and only its constructor reads the timeout:
+
+- Before: "Unless the cache, whose entries survive refresh, has been cleared, the new timeout setting, which only the constructor reads, will not take effect."
+- After: "The client reads the timeout only when it is created. Refreshing the cache keeps the existing client, so changing the timeout requires creating a new client."
+
+Put the useful claim in the main clause. Delete empty judgments such as "This gives us a robust foundation" or state the supported consequence. Do not add a conclusion that merely repeats the preceding paragraph.
+
+### What does the evidence establish?
+
+Preserve the scope, units, conditions, and uncertainty of each claim. Separate an observed result from a suspected cause or a prediction. Do not turn "may fix" into "fixes," local measurements into general performance claims, or one passing test into proof of the whole workflow. Do not add a cause, measurement, or guarantee to make a rewrite sound concrete.
+
+State which path or condition a change addresses. Removing one cause of a failure does not establish that the failure is impossible. Preserve an explicit technical caution when it prevents a plausible mistake, even if a shorter positive instruction would logically imply the same constraint.
+
+Replace praise and unsupported intensity with observations. Name the source of attributed claims. If the evidence is missing, qualify or remove the claim rather than inventing support. State established facts directly; attach uncertainty to the claim that is uncertain.
+
+### Does the presentation help?
+
+Use paragraphs for connected explanations, lists for parallel items or steps, and headings for navigation. Avoid making each sentence a bullet or each paragraph a labeled section. Use an example or visual when it resolves something prose alone leaves difficult; do not add one just to fill a template.
+
+Remove filler openings, canned closings, repeated summaries, and stock contrasts such as "not just X, but Y." Do not invent a third item to complete a group. Preserve useful contrasts and lists when the subject calls for them.
+
+Use sentence-case headings, straight quotes, and no decorative emojis or em dashes in authored prose. Preserve exact quotations and required formats. Apply these preferences after resolving meaning; punctuation and word substitutions cannot repair an unclear explanation.
 
 ## Final check
 
-- Can the intended reader understand the explanation without the writer's working context and distinguish facts from proposals?
-- Does every sentence add a fact, decision, instruction, example, or necessary context?
-- Could any sentence appear unchanged in another project's documentation? If so, make it specific or delete it.
-- Are claims tied to evidence or a named source?
-- Did the revision preserve exact quotations, identifiers, technical terms, required formats, and the user's voice?
+Read once without relying on the writer's working context:
+
+- Can the reader identify the actors, actions, and relationships without translating abstract phrases?
+- Is the main point easy to find, with enough context to understand why it matters?
+- Are facts, proposals, interpretations, and predictions distinguishable, with their scope intact?
+- Does each sentence add information, explain a relationship, or provide necessary context?
+- Did the revision preserve technical meaning, useful terminology, uncertainty, required formats, and the requested voice?
+
+For changes to these instructions, use the cases in [the writing evaluation](../../tests/writing/README.md). The approach draws on [Zonder Labs' discussion of unclear AI writing](https://zonderlabs.com/slop); the examples here are original.

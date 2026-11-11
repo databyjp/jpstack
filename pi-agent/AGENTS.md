@@ -1,8 +1,8 @@
 # Language
 
-Load the `unslop` skill when drafting or revising standalone documents (READMEs, guides, ADRs, handoffs, HTML reports) or multi-section plans.
+Load the `unslop` skill when drafting or revising standalone documents (READMEs, guides, ADRs, handoffs, HTML reports), multi-section plans, or explanations and reports that need a clarity pass. Apply the core writing rules in `APPEND_SYSTEM.md` to short replies and progress updates too.
 
-Prefer precise, established technical terminology over ambiguous shorthand. For example, prefer "CLI boundary" or "entrypoint orchestration," rather than broad phrases such as "process concerns." If no standard term fits, describe the mechanism directly.
+Use the names in the code or domain model, and explain what they do. For example, write "`main` parses CLI arguments and calls `run`" when that is the mechanism. Use established technical terms when they add precision; explain unfamiliar ones at first use. Do not replace vague shorthand with a more technical-sounding abstraction or invent a label for a relationship you can state directly.
 
 # Development preferences
 
