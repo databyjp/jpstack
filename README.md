@@ -49,6 +49,12 @@ claude() {
 
 Claude Code loads skills from `~/.claude/skills/`; `add_symlinks.py apply` links each skill there, so a change in `skills/` reaches Claude Code and Pi alike.
 
+## Writing guidance
+
+The core rules in [APPEND_SYSTEM.md](pi-agent/APPEND_SYSTEM.md) apply to replies and progress updates. [AGENTS.md](pi-agent/AGENTS.md) defines when to load [unslop](skills/unslop/SKILL.md) for a full revision or [the reporting skill](skills/jp-coding-preferences-reporting/SKILL.md) for code review guidance.
+
+The writing rules prioritize naming who does what, explaining relationships in familiar terms, and making the point easy to follow. Examples and review steps are conditional on what the reader needs. The [writing evaluation](tests/writing/README.md) provides fixed cases and a comparison procedure for future prompt revisions.
+
 ## Sandbox
 
 Install [Nono](https://github.com/nolabs-ai/nono), then install or update the tracked profile through Nono's draft workflow:

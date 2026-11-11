@@ -1,41 +1,24 @@
 ---
 name: unslop
-description: Reviews and revises substantial human-facing prose for concision, specificity, and natural language. Use when writing prose such as long outputs, documents, or even code comments.
+description: Drafts and revises human-facing prose for clear actions, causal relationships, precise terminology, and useful presentation. Use for substantial explanations, reports, documents, plans, comments, or clarity revisions.
 ---
 
 # Unslop
 
-Revise the draft without changing its facts, intent, technical meaning, required format, or requested voice. Reread it as its intended reader, without your working context, and rewrite violations rather than flagging them. Reduce reading effort, not just word count.
+Reduce the work the reader must do to understand the text. Preserve facts, intent, technical meaning, uncertainty, exact quotations, required formats, and the requested voice. Rewrite the draft rather than exposing an editing checklist unless asked.
 
 ## Revision pass
 
-- Start with the answer or necessary context. Delete openings such as "Of course!", "Great question!", and "You're absolutely right!"
-- Keep complete sentences when fragments obscure the subject, timing, or consequence. Replace "No paid runs; no retained log edited" with "This work uses existing results only. It will not launch paid Trials. Existing retained logs will remain unchanged."
-- Separate the current state, proposed change, rationale, and constraints when combining them makes a sentence difficult to follow.
-- Make clear whether a statement describes existing behavior, proposed behavior, or completed work. State the document's status once, then use consistent wording: "The report currently reads notes from..." versus "The report would read records from...".
-- Phrase actionable instructions as imperatives. Use declarative sentences for definitions, facts, and rationale. Replace "Comments are not records of the development session" with "Do not use comments to record the development session."
-- Cut sentences that do not help the reader act or understand. Delete "It is important to note that." Replace "In order to" with "To" and "due to the fact that" with "because."
-- Replace praise and mood with facts. Rewrite "This pivotal release showcases the team's groundbreaking work" to name the release, the change, and who made it.
-- Name mechanisms and measurements. Replace "SQL you can read" with "`.toSQL()` returns the exact string sent to the database." Replace "performance improved significantly" with the measured change.
-- Name the source of attributed claims. Replace "Experts believe" or "Industry reports suggest" with a named source and citation. Delete the claim if no source is available.
-- Write each sentence around what the reader can see or do next. Expand, ground, or cut any term the reader has not been given.
-- Replace vague participial phrases with actions or results. Rewrite clauses built around "highlighting," "ensuring," "reflecting," "showcasing," or "fostering" so they state what happened.
-- Prefer plain verbs and words when they preserve meaning. Replace "serves as" with "is," "utilize" with "use," and "facilitate" with "help." Keep established technical terms when a simpler word would be less precise.
-- Prefer concrete technical language over abstract metaphors. Replace "substrate" with "base" and "wedge in" with "add" when the replacement preserves the technical meaning.
-- Use one accurate qualifier. Replace "could potentially be" with "may."
-- Remove stock structures. State the point instead of writing "not just X, but Y." Do not invent a third item to make a group of three. Use "from X to Y" only when X and Y are endpoints on a meaningful scale.
-- Keep terminology stable. Do not call the same person "protagonist," "main character," "central figure," and "hero" in one passage.
-- Split sentences that require backtracking. Prefer "The loader parses the file. The compiler validates each query" to a sentence that buries both actions in subordinate clauses.
-- Prefer active voice when the actor matters. Replace "queries are validated" with "the compiler validates queries." Keep passive voice when the actor is unknown or irrelevant.
-- Use first person when reporting your own work. Write "I reduced 189 docstring lines to 125" rather than "189 docstring lines down to 125."
-- Remove formatting habits that do not aid navigation. Replace "**Performance:** Performance improved" with a direct sentence. "**Schema in TypeScript.** Tables live in one file." is acceptable because the second sentence adds information.
-- Use sentence-case headings, straight quotes, and no decorative emojis or em dashes. Use colons for lists or examples, not in place of a sentence break.
-- Delete canned endings such as "I hope this helps," "Let me know if you need anything else," and "The future looks bright." End with the result, decision, or next step.
+1. Establish what the reader needs to understand or decide. A short account of previous behavior can make a change understandable; omit background already established. Answer a direct question first when it needs no setup. Distinguish current behavior, proposals, and completed work.
+2. Make actors and actions clear. Usually put the actor in the subject and its action in the verb. Restore actions hidden in abstract nouns when that helps. Keep useful passive voice when the actor is unknown or irrelevant, and never invent an actor.
+3. Connect causes and consequences. Use "because," "so," or another explicit relationship rather than asking the reader to assemble a causal chain from short statements. Keep a longer sentence when it makes the relationship easier to follow; split when qualifiers or nested clauses force backtracking.
+4. Use precise, established terminology. For an experienced technical reader, "atomic update" may be clearer than expanding the concept into several clauses. Explain terms needed by the actual audience or requested by the user. Keep domain names stable. Unpack invented labels, vague pronouns, noun clusters, and metaphors into the actual relationship.
+5. Give each form a job. Keep causal reasoning in prose; use bullets for distinct steps or responsibilities, even short sequences. Let a useful source excerpt or diff carry the mechanism, and condense the prose to its purpose or consequence. Do not narrate every line, announce an obvious excerpt, invent source, or repeat a visible diff. Use headings only when they help navigation.
+6. Keep claims within the evidence. Preserve units, conditions, scope, and uncertainty. Separate observations from suspected causes and predictions. State the actual checks and results without a routine inventory of untested behavior. Mention a missing check when it changes a requested readiness decision; never claim a whole workflow passed from a narrower check. Preserve technical cautions that prevent plausible mistakes.
+7. Remove text that contributes no fact, relationship, decision, instruction, example, or necessary context. Delete filler, unsupported praise, repeated conclusions, and presentation commentary. Do not remove useful explanation merely to reduce word count. Reserve imperatives for actual instructions and first person for your own work.
 
 ## Final check
 
-- Can the intended reader understand the explanation without the writer's working context and distinguish facts from proposals?
-- Does every sentence add a fact, decision, instruction, example, or necessary context?
-- Could any sentence appear unchanged in another project's documentation? If so, make it specific or delete it.
-- Are claims tied to evidence or a named source?
-- Did the revision preserve exact quotations, identifiers, technical terms, required formats, and the user's voice?
+Can the intended reader follow who does what, why it happens, and why it matters on one reading? Is the level of technical explanation appropriate for that reader? Does code or formatting carry useful information without duplicating the prose? Are observations, proposals, and predictions distinguishable with their scope intact?
+
+Use sentence-case headings, straight quotes, and no decorative emojis or em dashes in authored prose. Preserve exact quotations and required formats. See [the writing evaluation](../../tests/writing/README.md) when changing these instructions. The clarity principles draw on [Zonder Labs](https://zonderlabs.com/slop).
