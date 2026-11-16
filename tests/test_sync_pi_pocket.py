@@ -1,7 +1,9 @@
+import errno
 import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -268,6 +270,440 @@ class PocketProfileTests(unittest.TestCase):
         self.cli("rollback")
         self.assertEqual(self.active(), self.first)
 
+    def retained(self, revision: str) -> Path:
+        retained = list((self.state / "revisions").glob(f"{revision}.incomplete-*"))
+        self.assertEqual(len(retained), 1)
+        return retained[0]
+
+    def assert_registered_worktree(self, source: Path, revision: str) -> None:
+        self.assertEqual(self.git(source, "rev-parse", "HEAD"), revision)
+        listing = self.git(self.checkout, "worktree", "list", "--porcelain")
+        self.assertIn(f"worktree {source}\n", listing)
+        git_dir = Path(self.git(source, "rev-parse", "--absolute-git-dir"))
+        self.assertEqual((git_dir / "gitdir").read_text().strip(), str(source / ".git"))
+
+    def test_worktree_creation_failure_allows_normal_install_retry(self) -> None:
+        repo = sync.Repository(self.checkout)
+        installation = sync.Installation(repo, self.home)
+        original = repo.git
+
+        def fail_add(*args: str) -> str:
+            if args[:2] == ("worktree", "add"):
+                raise sync.ProfileError("simulated worktree creation failure")
+            return original(*args)
+
+        with patch.object(repo, "git", fail_add):
+            with self.assertRaisesRegex(sync.ProfileError, "simulated"):
+                installation.activate(self.first)
+        release = installation.revisions / self.first
+        self.write(release / "notes.txt", "Keep this unfinished attempt")
+        self.assertFalse(installation.current.exists())
+        result = self.cli("install")
+        self.assertIn("preserved incomplete revision:", result.stdout)
+        self.assertEqual(self.active(), self.first)
+        self.assertEqual((self.retained(self.first) / "notes.txt").read_text(), "Keep this unfinished attempt")
+
+    def test_instruction_write_failure_preserves_edited_worktree_on_retry(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        release = installation.revisions / self.first
+        original = Path.write_text
+
+        def fail_instructions(path: Path, text: str, **kwargs) -> int:
+            if path == release / "AGENTS.md":
+                original(path, "Partial instructions", **kwargs)
+                raise OSError("simulated instruction write failure")
+            return original(path, text, **kwargs)
+
+        with patch.object(Path, "write_text", fail_instructions):
+            with self.assertRaisesRegex(OSError, "simulated"):
+                installation.activate(self.first)
+        self.write(release / "source/rules.md", "Local tracked edit")
+        self.write(release / "source/notes.txt", "Untracked work")
+        self.cli("install")
+        retained = self.retained(self.first)
+        self.assertEqual((retained / "AGENTS.md").read_text(), "Partial instructions")
+        self.assertEqual((retained / "source/rules.md").read_text(), "Local tracked edit")
+        self.assertEqual((retained / "source/notes.txt").read_text(), "Untracked work")
+        self.assert_registered_worktree(retained / "source", self.first)
+        self.assertIn("rules.md", self.git(retained / "source", "status", "--porcelain"))
+        self.assertIn("Keep changes reviewable", self.agents())
+        self.assertEqual(self.git(release / "source", "status", "--porcelain"), "")
+
+    def test_partial_metadata_write_is_not_published_and_retry_preserves_it(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        release = installation.revisions / self.first
+
+        def partial_dump(data, stream, **kwargs) -> None:
+            stream.write('{"revision":')
+            raise OSError("simulated metadata write failure")
+
+        with patch.object(sync.json, "dump", partial_dump):
+            with self.assertRaisesRegex(OSError, "simulated"):
+                installation.activate(self.first)
+        self.assertFalse((release / "profile-state.json").exists())
+        temporary = list(release.glob(".profile-state-*.tmp"))
+        self.assertEqual(len(temporary), 1)
+        self.cli("install")
+        retained = self.retained(self.first)
+        self.assertEqual((retained / temporary[0].name).read_text(), '{"revision":')
+        self.assert_registered_worktree(retained / "source", self.first)
+        self.assertEqual(installation.active()["revision"], self.first)
+
+    def test_metadata_publication_failure_allows_retry(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        release = installation.revisions / self.first
+        original = Path.replace
+
+        def fail_publication(path: Path, target: Path) -> Path:
+            if target == release / "profile-state.json":
+                self.assertFalse(target.exists())
+                self.assertEqual(json.loads(path.read_text())["revision"], self.first)
+                raise OSError("simulated metadata publication failure")
+            return original(path, target)
+
+        with patch.object(Path, "replace", fail_publication):
+            with self.assertRaisesRegex(OSError, "simulated"):
+                installation.activate(self.first)
+        self.assertFalse((release / "profile-state.json").exists())
+        self.cli("install")
+        self.assertEqual(self.active(), self.first)
+        self.assertEqual(len(list(self.retained(self.first).glob(".profile-state-*.tmp"))), 1)
+
+    def test_legacy_partial_metadata_is_preserved_on_normal_retry(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        release = installation.revisions / self.first
+        # Cover truncated JSON, a valid but unfinished object, and broken UTF-8.
+        for content in (b'{"revision":', b'{"skills": ["one"]}', b'\xff'):
+            with self.subTest(content=content):
+                with installation.locked():
+                    installation.stage(sync.load_profile(installation.repo, self.first))
+                (release / "profile-state.json").write_bytes(content)
+                with installation.locked():
+                    installation.stage(sync.load_profile(installation.repo, self.first))
+                retained = [path for path in installation.revisions.glob(f"{self.first}.incomplete-*")
+                            if (path / "profile-state.json").read_bytes() == content]
+                self.assertEqual(len(retained), 1)
+                self.assert_registered_worktree(retained[0] / "source", self.first)
+        self.cli("install")
+        self.assertEqual(self.active(), self.first)
+
+    def test_interrupted_recovery_repairs_registration_on_next_retry(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        release = installation.revisions / self.first
+        with installation.locked():
+            installation.stage(sync.load_profile(installation.repo, self.first))
+        (release / "profile-state.json").unlink()
+        self.write(release / "source/notes.txt", "Retain across interrupted recovery")
+        with patch.object(installation, "repair_retained_worktree",
+                          side_effect=KeyboardInterrupt("simulated interruption before repair")):
+            with self.assertRaisesRegex(KeyboardInterrupt, "simulated"):
+                installation.activate(self.first)
+        retained = self.retained(self.first)
+        self.assertFalse(release.exists())
+        self.cli("install")
+        self.assertEqual((retained / "source/notes.txt").read_text(), "Retain across interrupted recovery")
+        self.assert_registered_worktree(retained / "source", self.first)
+        self.assert_registered_worktree(release / "source", self.first)
+
+    def test_registered_stage_with_missing_or_partial_gitfile_allows_retry(self) -> None:
+        # Simulate interrupted Git creation: registration exists, but the Git
+        # file is absent or partial, or the entire checkout is still absent.
+        for mode in ("missing-gitfile", "partial-gitfile", "missing-source"):
+            with self.subTest(mode=mode):
+                self.home = self.root / mode
+                self.home.mkdir()
+                self.state = self.home / ".local/share/jpstack/pi-pocket"
+                installation = sync.Installation(sync.Repository(self.checkout), self.home)
+                with installation.locked():
+                    release = installation.stage(sync.load_profile(installation.repo, self.first))
+                (release / "profile-state.json").unlink()
+                if mode == "missing-source":
+                    shutil.rmtree(release / "source")
+                else:
+                    self.write(release / "source/notes.txt", mode)
+                    if mode == "missing-gitfile":
+                        (release / "source/.git").unlink()
+                    else:
+                        (release / "source/.git").write_bytes(b"gitdir: interrupted")
+                self.cli("install")
+                self.assertEqual(self.active(), self.first)
+                retained = self.retained(self.first)
+                self.assert_registered_worktree(retained / "source", self.first)
+                if mode != "missing-source":
+                    self.assertEqual((retained / "source/notes.txt").read_text(), mode)
+                if mode == "partial-gitfile":
+                    backup, = retained.glob(".worktree-gitfile-*")
+                    self.assertEqual(backup.read_bytes(), b"gitdir: interrupted")
+
+    def test_damaged_retained_git_metadata_warns_without_blocking_updates(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        with installation.locked():
+            release = installation.stage(sync.load_profile(installation.repo, self.first))
+        (release / "profile-state.json").unlink()
+        self.write(release / "source/notes.txt", "Preserve despite lost Git metadata")
+        self.cli("install")
+        retained = self.retained(self.first)
+        admin = Path(self.git(retained / "source", "rev-parse", "--absolute-git-dir"))
+        # Damage only this temporary fixture's retained registration.
+        shutil.rmtree(admin)
+        second = self.change_policy()
+        self.cli("update")
+        result = self.cli("update", "--apply", second)
+        self.assertIn("warning: cannot repair retained worktree", result.stderr)
+        self.assertEqual(self.active(), second)
+        self.assertEqual((retained / "source/notes.txt").read_text(), "Preserve despite lost Git metadata")
+        self.cli("rollback")
+        self.assertEqual(self.active(), self.first)
+
+    def test_reused_git_admin_name_is_not_reclaimed_by_retained_worktree(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        with installation.locked():
+            release = installation.stage(sync.load_profile(installation.repo, self.first))
+        (release / "profile-state.json").unlink()
+        self.write(release / "source/notes.txt", "Old retained work")
+        self.cli("install")
+        retained = self.retained(self.first)
+        freed_admin = Path(self.git(retained / "source", "rev-parse", "--absolute-git-dir"))
+        shutil.rmtree(freed_admin)
+        second = self.change_policy("Second policy")
+        self.cli("update")
+        self.cli("update", "--apply", second)
+        second_source = installation.revisions / second / "source"
+        reused_admin = Path(self.git(second_source, "rev-parse", "--absolute-git-dir"))
+        self.assertEqual(reused_admin, freed_admin)
+        # Reuse of a complete revision must not let the old .git file redirect
+        # this newly allocated registration back to its retained directory.
+        with installation.locked():
+            installation.stage(sync.load_profile(installation.repo, second))
+        self.assert_registered_worktree(second_source, second)
+        self.assertEqual((retained / "source/notes.txt").read_text(), "Old retained work")
+        original_index = (reused_admin / "index").read_bytes()
+        for arguments in (("rev-parse", "HEAD"), ("add", "-A")):
+            result = subprocess.run(["git", "-C", str(retained / "source"), *arguments],
+                                    env=self.environment, capture_output=True, text=True, check=False)
+            self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertEqual((reused_admin / "index").read_bytes(), original_index)
+        self.assertEqual((retained / "source/.git").read_bytes(), sync.UNAVAILABLE_GITFILE)
+        self.assertTrue(any(path.read_bytes().startswith(b"gitdir: ")
+                            for path in retained.glob(".worktree-gitfile-*")))
+        # Recovery of another partial stage must not run broad Git repair either.
+        third = self.change_policy("Third policy")
+        self.cli("update")
+        with patch.object(sync.Installation, "publish_metadata", side_effect=OSError("simulated")):
+            with self.assertRaisesRegex(OSError, "simulated"):
+                installation.update(third)
+        self.cli("update", "--apply", third)
+        self.assert_registered_worktree(second_source, second)
+        self.assertEqual(self.active(), third)
+        self.cli("rollback")
+        self.assertEqual(self.active(), second)
+        self.assert_registered_worktree(second_source, second)
+
+    def test_safety_gitfile_write_failure_fails_closed_and_allows_later_retry(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        with installation.locked():
+            release = installation.stage(sync.load_profile(installation.repo, self.first))
+        (release / "profile-state.json").unlink()
+        self.cli("install")
+        original_agents = self.agents()
+        retained = self.retained(self.first)
+        gitfile = retained / "source/.git"
+        original_gitfile = gitfile.read_bytes()
+        admin = Path(self.git(retained / "source", "rev-parse", "--absolute-git-dir"))
+        shutil.rmtree(admin)
+        second = self.change_policy()
+        self.cli("update")
+        original_replace = sync.Installation.replace_registration
+
+        def no_space(path: Path, content: bytes, release: Path, label: str) -> None:
+            if path == gitfile:
+                raise OSError(errno.ENOSPC, "simulated safety-file write failure")
+            original_replace(path, content, release, label)
+
+        with patch.object(sync.Installation, "replace_registration", staticmethod(no_space)):
+            with self.assertRaisesRegex(OSError, "simulated safety-file"):
+                installation.update(second)
+        self.assertEqual(self.active(), self.first)
+        self.assertEqual(self.agents(), original_agents)
+        self.assertEqual(gitfile.read_bytes(), original_gitfile)
+        self.assertFalse((installation.revisions / second).exists())
+        self.cli("update", "--apply", second)
+        self.assertEqual(self.active(), second)
+        self.assertEqual(gitfile.read_bytes(), sync.UNAVAILABLE_GITFILE)
+
+    def test_unsupported_directory_fsync_does_not_block_installation(self) -> None:
+        original_fsync = os.fsync
+        for error_number in (errno.EINVAL, errno.ENOTSUP, errno.EBADF):
+            with self.subTest(error_number=error_number):
+                home = self.root / f"unsupported-fsync-{error_number}"
+                installation = sync.Installation(sync.Repository(self.checkout), home)
+
+                def unsupported(descriptor: int) -> None:
+                    if stat.S_ISDIR(os.fstat(descriptor).st_mode):
+                        raise OSError(error_number, "directory fsync unsupported")
+                    original_fsync(descriptor)
+
+                with patch.object(sync.os, "fsync", unsupported):
+                    installation.activate(self.first)
+                self.assertEqual(installation.active()["revision"], self.first)
+
+    def test_restored_retained_admin_metadata_recovers_disabled_gitfile(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        with installation.locked():
+            release = installation.stage(sync.load_profile(installation.repo, self.first))
+        (release / "profile-state.json").unlink()
+        self.cli("install")
+        retained = self.retained(self.first)
+        admin = Path(self.git(retained / "source", "rev-parse", "--absolute-git-dir"))
+        saved = self.root / "saved-admin"
+        admin.rename(saved)
+        with installation.locked():
+            installation.repair_incomplete_worktrees()
+        self.assertEqual((retained / "source/.git").read_bytes(), sync.UNAVAILABLE_GITFILE)
+        saved.rename(admin)
+        with installation.locked():
+            installation.repair_incomplete_worktrees()
+        self.assert_registered_worktree(retained / "source", self.first)
+
+    def test_changed_admin_identity_prevents_repair_of_an_absent_old_path(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        with installation.locked():
+            release = installation.stage(sync.load_profile(installation.repo, self.first))
+        (release / "profile-state.json").unlink()
+        self.cli("install")
+        retained = self.retained(self.first)
+        admin = Path(self.git(retained / "source", "rev-parse", "--absolute-git-dir"))
+        # Simulate reuse at the exact same canonical path, with no source yet.
+        # Even the old back-pointer alone cannot prove allocation ownership.
+        (admin / "jpstack-owner").write_text("changed allocation\n")
+        old_backlink = str(release / "source/.git") + "\n"
+        (admin / "gitdir").write_text(old_backlink)
+        saved = self.root / "saved-complete-release"
+        release.rename(saved)
+        try:
+            with self.assertRaisesRegex(sync.ProfileError, "identity is missing or changed"):
+                installation.repair_retained_worktree(retained, installation.worktree_admin_root())
+            self.assertEqual((admin / "gitdir").read_text(), old_backlink)
+        finally:
+            saved.rename(release)
+
+    def test_registration_rewrite_flushes_backup_before_atomic_replacement(self) -> None:
+        target = self.root / "pointer"
+        target.write_bytes(b"original registration\n")
+        original_replace = Path.replace
+        with patch.object(sync.os, "fsync", wraps=os.fsync) as fsync:
+            def checked_replace(path: Path, destination: Path) -> Path:
+                self.assertEqual(destination, target)
+                backup, = self.root.glob(".worktree-test-*")
+                self.assertEqual(backup.read_bytes(), b"original registration\n")
+                self.assertEqual(target.read_bytes(), b"original registration\n")
+                # Backup file, backup directory, and replacement file are
+                # synced before the replacement; its directory follows it.
+                self.assertEqual(fsync.call_count, 3)
+                return original_replace(path, destination)
+
+            with patch.object(Path, "replace", checked_replace):
+                sync.Installation.replace_registration(target, b"new registration\n", self.root, "test")
+            self.assertEqual(fsync.call_count, 4)
+        self.assertEqual(target.read_bytes(), b"new registration\n")
+
+    def test_failed_update_staging_preserves_active_profile_and_allows_apply_retry(self) -> None:
+        self.cli("install")
+        original_agents = self.agents()
+        original_skill = (self.home / ".agents/skills/one/SKILL.md").read_text()
+        self.manifest["skills"] = ["two"]
+        self.write_manifest()
+        second = self.change_policy("Second policy")
+        self.cli("update")
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        release = installation.revisions / second
+        original_git = installation.repo.git
+
+        def fail_add(*args: str) -> str:
+            if args[:2] == ("worktree", "add"):
+                raise sync.ProfileError("simulated update worktree failure")
+            return original_git(*args)
+
+        def partial_dump(data, stream, **kwargs) -> None:
+            stream.write("{")
+            raise OSError("simulated update metadata failure")
+
+        for failure in (patch.object(installation.repo, "git", fail_add),
+                        patch.object(sync.json, "dump", partial_dump)):
+            with failure:
+                with self.assertRaisesRegex((sync.ProfileError, OSError), "simulated"):
+                    installation.update(second)
+            self.assertEqual(self.active(), self.first)
+            self.assertEqual(self.agents(), original_agents)
+            self.assertEqual((self.home / ".agents/skills/one/SKILL.md").read_text(), original_skill)
+            self.assertFalse((self.home / ".agents/skills/two").is_symlink())
+            self.assertFalse((self.state / "previous").is_symlink())
+        self.write(release / "source/notes.txt", "Keep failed update work")
+        self.cli("update", "--apply", second)
+        self.assertEqual(self.active(), second)
+        self.assertIn("Second policy", self.agents())
+        self.assertFalse((self.home / ".agents/skills/one").is_symlink())
+        self.assertTrue((self.home / ".agents/skills/two").is_symlink())
+        retained = [path for path in installation.revisions.glob(f"{second}.incomplete-*")
+                    if (path / "source/notes.txt").exists()]
+        self.assertEqual(len(retained), 1)
+        self.assert_registered_worktree(retained[0] / "source", second)
+        self.cli("rollback")
+        self.assertEqual(self.active(), self.first)
+        self.assertEqual(self.agents(), original_agents)
+
+    def test_completed_inactive_revision_still_rejects_local_edits(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        with installation.locked():
+            release = installation.stage(sync.load_profile(installation.repo, self.first))
+        for relative, expected in (("AGENTS.md", "local edits"), ("source/rules.md", "local changes")):
+            with self.subTest(relative=relative):
+                path = release / relative
+                original = path.read_text()
+                self.write(path, "Keep local edits")
+                self.assertIn(expected, self.cli("install", success=False).stderr)
+                self.assertEqual(path.read_text(), "Keep local edits")
+                self.assertEqual(list(installation.revisions.glob("*.incomplete-*")), [])
+                self.write(path, original)
+        self.cli("install")
+        self.assertEqual(self.active(), self.first)
+
+    def test_completed_revision_with_wrong_ownership_is_not_recovered(self) -> None:
+        installation = sync.Installation(sync.Repository(self.checkout), self.home)
+        with installation.locked():
+            release = installation.stage(sync.load_profile(installation.repo, self.first))
+        path = release / "profile-state.json"
+        data = json.loads(path.read_text())
+        data["home"] = str(self.root / "someone-else")
+        self.write(path, json.dumps(data))
+        self.assertIn("invalid managed revision metadata", self.cli("install", success=False).stderr)
+        self.assertEqual(json.loads(path.read_text()), data)
+        self.assertEqual(list(installation.revisions.glob("*.incomplete-*")), [])
+
+    def test_incomplete_revision_symlink_conflicts_are_not_followed_or_moved(self) -> None:
+        release = self.state / "revisions" / self.first
+        release.parent.mkdir(parents=True)
+        outside = self.root / "outside"
+        outside.mkdir()
+        self.write(outside / "notes.txt", "Untouched")
+        for relative in ("", "source", "AGENTS.md", "profile-state.json", ".worktree-registration.json", "source/.git"):
+            with self.subTest(relative=relative):
+                path = release / relative if relative else release
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.symlink_to(outside)
+                self.assertIn("redirect", self.cli("install", success=False).stderr)
+                self.assertTrue(path.is_symlink())
+                self.assertEqual((outside / "notes.txt").read_text(), "Untouched")
+                self.assertEqual(list(release.parent.glob("*.incomplete-*")), [])
+                path.unlink()
+
+    def test_dangling_revision_symlink_is_rejected(self) -> None:
+        release = self.state / "revisions" / self.first
+        release.parent.mkdir(parents=True)
+        release.symlink_to(self.root / "missing")
+        self.assertIn("redirect", self.cli("install", success=False).stderr)
+        self.assertTrue(release.is_symlink())
+
     def test_lock_refuses_concurrent_installation(self) -> None:
         (self.state / ".sync-lock").mkdir(parents=True)
         self.assertIn("another sync", self.cli("install", success=False).stderr)
@@ -287,9 +723,25 @@ class PocketProfileTests(unittest.TestCase):
         self.assertIn("## Writing style", profile.instructions)
         self.assertIn("## Editing discipline", profile.instructions)
         self.assertIn("## Code style", profile.instructions)
+        self.assertIn("## Visual delivery in Pi Pocket", profile.instructions)
+        self.assertIn("overrides `show-me`'s desktop `Bash(open", profile.instructions)
+        self.assertIn("Check which tools the session exposes", profile.instructions)
+        self.assertIn("Prefer `artifact` when available", profile.instructions)
+        self.assertIn("local file's `path`", profile.instructions)
+        self.assertIn("`browser` tool is available", profile.instructions)
+        self.assertIn("`navigate` action with `url`", profile.instructions)
+        self.assertIn("Markdown diagram, fenced code-shape sketch, or focused `diff` directly in chat", profile.instructions)
+        self.assertIn("Do not enable extensions", profile.instructions)
+        self.assertIn("Bash(open path/to/show-me-{description}.html)",
+                      (REPO_ROOT / "skills/show-me/SKILL.md").read_text())
         self.assertNotIn("Sessions run inside a nono sandbox", profile.instructions)
         self.assertNotIn("load `gated-development`", profile.instructions)
         self.assertNotIn("Host browsers cannot run", profile.instructions)
+        self.git(self.seed, "push", "-q", "origin", "main")
+        self.git(self.checkout, "pull", "--ff-only")
+        self.cli("install")
+        self.assertEqual(self.agents(), profile.instructions)
+        self.assertEqual({path.name for path in (self.home / ".agents/skills").iterdir()}, set(profile.skills))
 
 
 class MarkdownSectionTests(unittest.TestCase):
