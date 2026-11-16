@@ -1,5 +1,22 @@
 # Agentic coding setup
 
+## Pi Pocket
+
+Use the [curated Pi Pocket profile](profiles/pi-pocket/README.md) for the server
+and mobile app. It selects six skills, composes portable preferences from the
+existing instruction files, and provides reviewed updates and rollback:
+
+```bash
+python3 sync_pi_pocket.py install
+python3 sync_pi_pocket.py update
+python3 sync_pi_pocket.py update --apply FULL_COMMIT_HASH
+python3 sync_pi_pocket.py rollback
+```
+
+Run these as the Pi Pocket service user. Per-revision worktrees keep a repository
+pull from silently changing the active profile. The full-workstation setup below
+is for terminal Pi and Claude Code.
+
 ## Add symlinks
 
 Run from the repository root:
