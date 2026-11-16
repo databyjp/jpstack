@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "skills": [
+    "unslop",
+    "code-documentation",
+    "jp-coding-preferences-reporting",
+    "show-me",
+    "grill-me",
+    "grilling"
+  ],
+  "skill_dependencies": {
+    "jp-coding-preferences-reporting": ["unslop", "show-me"],
+    "grill-me": ["grilling"]
+  },
+  "instruction_sources": [
+    {
+      "path": "pi-agent/APPEND_SYSTEM.md",
+      "sections": [
+        {"heading": "Writing style"},
+        {"heading": "Editing discipline"}
+      ]
+    },
+    {
+      "path": "pi-agent/AGENTS.md",
+      "sections": [
+        {"heading": "Development preferences", "subsections": false},
+        {"heading": "Code style"}
+      ]
+    },
+    {"path": "profiles/pi-pocket/instructions.md"}
+  ]
+}
