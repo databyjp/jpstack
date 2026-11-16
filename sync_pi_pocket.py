@@ -7,6 +7,7 @@ source checkout cannot change the instructions or skills a running agent sees.
 import argparse
 from contextlib import contextmanager
 from dataclasses import dataclass
+import errno
 import hashlib
 import json
 import os
@@ -19,6 +20,9 @@ import uuid
 PROFILE_PATH = "profiles/pi-pocket/profile.json"
 SKILL_NAME = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\Z")
 REVISION = re.compile(r"[0-9a-f]{40,64}\Z")
+INCOMPLETE_REVISION = re.compile(r"[0-9a-f]{40,64}\.incomplete-[0-9a-f]{32}\Z")
+STATE_FIELDS = {"revision", "skills", "home", "repository", "instructions_sha256"}
+UNAVAILABLE_GITFILE = b"jpstack: Git registration unavailable; restore verified metadata before using Git here.\n"
 
 
 class ProfileError(Exception):
@@ -197,15 +201,40 @@ class Installation:
             if path.is_symlink() or (path.exists() and not path.is_dir()):
                 raise ProfileError(f"expected a real directory, not a redirected or conflicting path: {path}")
 
-    def metadata(self, release: Path) -> dict:
+    @staticmethod
+    def revision_paths(release: Path) -> None:
+        for path in (release, release / "source"):
+            if path.is_symlink() or (path.exists() and not path.is_dir()):
+                raise ProfileError(f"managed revision must not redirect to another directory: {path}")
+        for name in ("AGENTS.md", "profile-state.json", ".worktree-registration.json", "source/.git"):
+            path = release / name
+            if path.is_symlink() or (path.exists() and not path.is_file()):
+                raise ProfileError(f"expected a regular managed file, not a redirected or conflicting path: {path}")
+
+    def revision_state(self, release: Path) -> dict | None:
+        """A missing or unfinished completion record marks a recoverable stage."""
         if release.parent != self.revisions or not REVISION.fullmatch(release.name):
             raise ProfileError(f"profile pointer is outside managed revisions: {release}")
-        if release.is_symlink() or (release / "source").is_symlink():
-            raise ProfileError(f"managed revision must not redirect to another directory: {release}")
+        self.revision_paths(release)
         try:
             data = json.loads((release / "profile-state.json").read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as error:
+        except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError):
+            return None
+        except OSError as error:
             raise ProfileError(f"cannot read managed revision {release}: {error}") from error
+        if not isinstance(data, dict):
+            return None
+        # Even an unfinished record must not claim another installation.
+        for key, expected in (("revision", release.name), ("home", str(self.home)),
+                              ("repository", str(self.repo.root))):
+            if key in data and data[key] != expected:
+                raise ProfileError(f"invalid managed revision metadata: {release}")
+        return data if STATE_FIELDS <= data.keys() else None
+
+    def metadata(self, release: Path) -> dict:
+        data = self.revision_state(release)
+        if data is None:
+            raise ProfileError(f"cannot read managed revision {release}: incomplete profile-state.json")
         if (data.get("revision") != release.name or data.get("home") != str(self.home)
                 or data.get("repository") != str(self.repo.root)
                 or not isinstance(data.get("skills"), list)
@@ -260,13 +289,175 @@ class Installation:
         finally:
             lock.rmdir()
 
+    def worktree_admin_root(self) -> Path:
+        common = self.repo.git("rev-parse", "--git-common-dir").strip()
+        root = Path(os.path.abspath(self.repo.root / common)) / "worktrees"
+        if root.is_symlink() or (root.exists() and not root.is_dir()):
+            raise ProfileError(f"redirected or conflicting Git worktree registry: {root}")
+        return root
+
+    @staticmethod
+    def regular_bytes(path: Path) -> bytes:
+        if path.is_symlink() or not path.is_file():
+            raise ProfileError(f"expected a regular registration file: {path}")
+        return path.read_bytes()
+
+    @staticmethod
+    def sync_directory(path: Path) -> None:
+        descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+        try:
+            try:
+                os.fsync(descriptor)
+            except OSError as error:
+                if error.errno not in (errno.EINVAL, errno.ENOTSUP, errno.EBADF):
+                    raise
+                print(f"warning: directory fsync is unsupported for {path}; "
+                      "atomic replacement remains available, but power-loss durability is not guaranteed",
+                      file=sys.stderr)
+        finally:
+            os.close(descriptor)
+
+    @staticmethod
+    def replace_registration(path: Path, content: bytes, release: Path, label: str) -> None:
+        """Keep durable original bytes before atomically changing a Git pointer."""
+        if path.exists() or path.is_symlink():
+            original = Installation.regular_bytes(path)
+            if original == content:
+                return
+            backup = release / f".worktree-{label}-{uuid.uuid4().hex}"
+            with backup.open("xb") as stream:
+                stream.write(original)
+                stream.flush()
+                os.fsync(stream.fileno())
+            Installation.sync_directory(release)
+        temporary = path.with_name(f".jpstack-{path.name}-{uuid.uuid4().hex}.tmp")
+        with temporary.open("xb") as stream:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.replace(path)
+        Installation.sync_directory(path.parent)
+
+    def prepare_incomplete_worktree(self, release: Path) -> None:
+        """Find registration by its back-pointer, not a possibly stale .git file."""
+        source = release / "source"
+        expected = str(source / ".git")
+        root = self.worktree_admin_root()
+        matches = []
+        for admin in sorted(root.iterdir()) if root.exists() else []:
+            if admin.is_symlink() or not admin.is_dir():
+                continue
+            try:
+                backlink = self.regular_bytes(admin / "gitdir").decode("utf-8").strip()
+            except (ProfileError, OSError, UnicodeError):
+                continue
+            if backlink == expected:
+                matches.append(admin)
+        if len(matches) > 1:
+            raise ProfileError(f"ambiguous worktree registrations for {source}")
+        receipt = release / ".worktree-registration.json"
+        if matches:
+            admin = matches[0]
+            identity = uuid.uuid4().hex
+            # Bind the retained stage to this allocation of an admin directory,
+            # not merely its reusable name or its reusable canonical source path.
+            record = json.dumps({"admin": str(admin), "identity": identity}) + "\n"
+            self.replace_registration(receipt, record.encode("utf-8"), release, "receipt")
+            self.replace_registration(admin / "jpstack-owner", (identity + "\n").encode("utf-8"),
+                                      release, "identity")
+            source.mkdir(exist_ok=True)
+            self.replace_registration(source / ".git", f"gitdir: {admin}\n".encode("utf-8"),
+                                      release, "gitfile")
+        else:
+            if receipt.exists():
+                self.replace_registration(receipt, b"{}\n", release, "receipt")
+            if (source / ".git").exists():
+                print(f"warning: no owned Git registration for {source}; preserving its files without repair",
+                      file=sys.stderr)
+
+    def repair_retained_worktree(self, retained: Path, root: Path) -> None:
+        source = retained / "source"
+        gitfile = source / ".git"
+        receipt_path = retained / ".worktree-registration.json"
+        if not gitfile.exists() and not receipt_path.exists():
+            return
+        receipt = json.loads(self.regular_bytes(receipt_path))
+        if (not isinstance(receipt, dict) or not isinstance(receipt.get("admin"), str)
+                or not isinstance(receipt.get("identity"), str)
+                or not re.fullmatch(r"[0-9a-f]{32}", receipt["identity"])):
+            raise ProfileError("missing or invalid registration ownership receipt")
+        admin = Path(receipt["admin"])
+        if admin.parent != root or admin.is_symlink() or not admin.is_dir():
+            raise ProfileError("Git administrative directory is missing or not owned by this repository")
+        if self.regular_bytes(admin / "jpstack-owner").decode("utf-8").strip() != receipt["identity"]:
+            raise ProfileError("Git registration identity is missing or changed; refusing to redirect it")
+        backlink = self.regular_bytes(admin / "gitdir").decode("utf-8").strip()
+        if backlink == str(gitfile):
+            source.mkdir(exist_ok=True)
+            self.replace_registration(gitfile, f"gitdir: {admin}\n".encode("utf-8"), retained, "gitfile")
+            return
+        revision = retained.name.split(".incomplete-", 1)[0]
+        original_source = self.revisions / revision / "source"
+        # A moved stage can still have its old back-pointer. It is safe to fix
+        # only while that old path is absent. A reused admin name is not proof
+        # of ownership: it can now belong to a different or newer worktree.
+        if (backlink != str(original_source / ".git")
+                or original_source.exists() or original_source.is_symlink()):
+            raise ProfileError("Git registration belongs to another worktree; refusing to redirect it")
+        source.mkdir(exist_ok=True)
+        self.replace_registration(gitfile, f"gitdir: {admin}\n".encode("utf-8"), retained, "gitfile")
+        self.replace_registration(admin / "gitdir", (str(gitfile) + "\n").encode("utf-8"),
+                                  retained, "backlink")
+
+    def repair_incomplete_worktrees(self) -> None:
+        # Repeat interrupted moves, but never trust a retained .git file alone.
+        root = self.worktree_admin_root()
+        for retained in sorted(self.revisions.glob("*.incomplete-*")):
+            if not INCOMPLETE_REVISION.fullmatch(retained.name):
+                continue
+            self.revision_paths(retained)
+            try:
+                self.repair_retained_worktree(retained, root)
+            except (ProfileError, OSError, UnicodeError, json.JSONDecodeError) as error:
+                gitfile = retained / "source/.git"
+                if gitfile.exists():
+                    # A stale pointer can share another worktree's index after
+                    # Git reuses an admin name. Preserve it, then stop Git from
+                    # following it or searching a parent repository instead.
+                    self.replace_registration(gitfile, UNAVAILABLE_GITFILE, retained, "gitfile")
+                print(f"warning: cannot repair retained worktree {retained / 'source'}: {error}; "
+                      "files remain preserved; Git is unavailable here until verified metadata is restored",
+                      file=sys.stderr)
+
+    @staticmethod
+    def publish_metadata(release: Path, data: dict) -> None:
+        # Only a complete, flushed record can acquire the completion filename.
+        # Leave interrupted writes beside the other staged files for recovery.
+        temporary = release / f".profile-state-{uuid.uuid4().hex}.tmp"
+        with temporary.open("x", encoding="utf-8") as stream:
+            json.dump(data, stream, indent=2)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.replace(release / "profile-state.json")
+        Installation.sync_directory(release)
+
     def stage(self, profile: Profile) -> Path:
         release = self.revisions / profile.revision
-        if release.exists():
-            data = self.metadata(release)
-            if data["skills"] != list(profile.skills):
-                raise ProfileError("saved revision has a different skill selection")
-            return release
+        if release.exists() or release.is_symlink():
+            if self.revision_state(release) is not None:
+                data = self.metadata(release)
+                if data["skills"] != list(profile.skills):
+                    raise ProfileError("saved revision has a different skill selection")
+                self.repair_incomplete_worktrees()
+                return release
+            self.repair_incomplete_worktrees()
+            self.prepare_incomplete_worktree(release)
+            retained = release.with_name(f"{release.name}.incomplete-{uuid.uuid4().hex}")
+            release.rename(retained)
+            self.sync_directory(self.revisions)
+            print(f"preserved incomplete revision: {retained}")
+        self.repair_incomplete_worktrees()
         release.mkdir(parents=True)
         self.repo.git("worktree", "add", "--quiet", "--detach", str(release / "source"), profile.revision)
         agents = release / "AGENTS.md"
@@ -274,7 +465,7 @@ class Installation:
         data = {"revision": profile.revision, "skills": list(profile.skills),
                 "home": str(self.home), "repository": str(self.repo.root),
                 "instructions_sha256": digest(agents)}
-        (release / "profile-state.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+        self.publish_metadata(release, data)
         return release
 
     def activate(self, revision: str, advance_checkout: bool = False) -> None:
