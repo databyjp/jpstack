@@ -1,5 +1,5 @@
 {
-  "extends": ["jph-default", "jph-docker", "nolabs-ai/pi", "nolabs-ai/claude"],
+  "extends": ["jph-default", "jph-docker", "nolabs-ai/pi", "nolabs-ai/claude", "gh-jph"],
   "meta": {
     "name": "pi-jph",
     "version": "",

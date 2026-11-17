@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "name": "gh-agent",
+    "description": "Public GitHub work as ar-woodhouse; real credentials stay in the host proxy"
+  },
+  "filesystem": {
+    "deny": [
+      "$HOME/.config/gh",
+      "$HOME/.config/git",
+      "$HOME/.gitconfig",
+      "$HOME/.git-credentials",
+      "$HOME/.ssh",
+      "$HOME/Library/Keychains",
+      "$HOME/.config/nono/profiles",
+      "$HOME/code/agents/jpstack/nono",
+      "$HOME/.colima",
+      "/var/run/docker.sock"
+    ]
+  },
+  "network": {
+    "allow_domain": ["*"],
+    "credentials": ["github_api", "github_git"],
+    "tls_intercept": { "ca_lifecycle": "trusted" },
+    "custom_credentials": {
+      "github_api": {
+        "upstream": "https://api.github.com",
+        "credential_key": "keyring://nono-agent/github-pat",
+        "env_var": "GH_TOKEN",
+        "credential_format": "Bearer {}"
+      },
+      "github_git": {
+        "upstream": "https://github.com",
+        "credential_key": "cmd://github_git",
+        "env_var": "GITHUB_GIT_TOKEN",
+        "inject_mode": "basic_auth",
+        "endpoint_rules": [
+          { "method": "GET", "path": "/*/*/info/refs" },
+          { "method": "GET", "path": "/*/*/HEAD" },
+          { "method": "POST", "path": "/*/*/git-upload-pack" },
+          { "method": "POST", "path": "/ar-woodhouse/*/git-receive-pack" }
+        ]
+      }
+    }
+  },
+  "environment": {
+    "allow_vars": [
+      "PATH", "HOME", "USER", "LOGNAME", "SHELL",
+      "TERM", "COLORTERM", "TERM_PROGRAM", "TERM_PROGRAM_VERSION",
+      "LANG", "LC_*", "TMPDIR", "TMP", "TEMP", "PI_*", "AI_AGENT",
+      "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN",
+      "GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENROUTER_API_KEY"
+    ],
+    "deny_vars": ["GH_*", "GITHUB_*", "GIT_*", "SSH_*", "GCM_*"],
+    "set_vars": {
+      "GH_CONFIG_DIR": "$HOME/.cache/nono-gh-agent",
+      "GH_HOST": "github.com",
+      "GH_PROMPT_DISABLED": "1",
+      "GIT_TERMINAL_PROMPT": "0",
+      "GIT_CONFIG_NOSYSTEM": "1",
+      "GIT_CONFIG_GLOBAL": "/dev/null",
+      "GIT_CONFIG_COUNT": "7",
+      "GIT_CONFIG_KEY_0": "credential.helper",
+      "GIT_CONFIG_VALUE_0": "",
+      "GIT_CONFIG_KEY_1": "url.https://github.com/.insteadOf",
+      "GIT_CONFIG_VALUE_1": "git@github.com:",
+      "GIT_CONFIG_KEY_2": "url.https://github.com/.insteadOf",
+      "GIT_CONFIG_VALUE_2": "ssh://git@github.com/",
+      "GIT_CONFIG_KEY_3": "user.name",
+      "GIT_CONFIG_VALUE_3": "ar-woodhouse",
+      "GIT_CONFIG_KEY_4": "user.email",
+      "GIT_CONFIG_VALUE_4": "357525867+ar-woodhouse@users.noreply.github.com",
+      "GIT_CONFIG_KEY_5": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_5": "false",
+      "GIT_CONFIG_KEY_6": "credential.interactive",
+      "GIT_CONFIG_VALUE_6": "false"
+    }
+  },
+  "credential_capture": {
+    "github_git": {
+      "command": ["/bin/sh", "-c", "token=$(/usr/bin/security find-generic-password -s nono-agent -a github-pat -w) || exit 1; test -n \"$token\" || exit 1; printf 'ar-woodhouse:%s' \"$token\""],
+      "timeout_secs": 5,
+      "cache_ttl_secs": 900
+    }
+  }
+}

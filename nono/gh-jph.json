@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "name": "gh-jph",
+    "description": "GitHub API and HTTPS Git as databyjp through the host credential proxy"
+  },
+  "network": {
+    "allow_domain": ["*"],
+    "credentials": ["github_api", "github_git"],
+    "tls_intercept": { "ca_lifecycle": "trusted" },
+    "custom_credentials": {
+      "github_api": {
+        "upstream": "https://api.github.com",
+        "credential_key": "cmd://github_api",
+        "env_var": "GH_TOKEN",
+        "credential_format": "Bearer {}"
+      },
+      "github_git": {
+        "upstream": "https://github.com",
+        "credential_key": "cmd://github_git",
+        "env_var": "GITHUB_GIT_TOKEN",
+        "inject_mode": "basic_auth"
+      }
+    }
+  },
+  "environment": {
+    "deny_vars": ["GH_TOKEN", "GITHUB_TOKEN", "GITHUB_GIT_TOKEN", "GIT_CONFIG_*"],
+    "set_vars": {
+      "GH_CONFIG_DIR": "$HOME/.cache/nono-gh-jph",
+      "GH_PROMPT_DISABLED": "1",
+      "GIT_TERMINAL_PROMPT": "0",
+      "GIT_CONFIG_COUNT": "3",
+      "GIT_CONFIG_KEY_0": "credential.https://github.com.helper",
+      "GIT_CONFIG_VALUE_0": "",
+      "GIT_CONFIG_KEY_1": "url.https://github.com/.insteadOf",
+      "GIT_CONFIG_VALUE_1": "git@github.com:",
+      "GIT_CONFIG_KEY_2": "url.https://github.com/.insteadOf",
+      "GIT_CONFIG_VALUE_2": "ssh://git@github.com/"
+    }
+  },
+  "credential_capture": {
+    "github_api": {
+      "command": ["/usr/bin/env", "-u", "GH_TOKEN", "-u", "GITHUB_TOKEN", "/opt/homebrew/bin/gh", "auth", "token", "--hostname", "github.com", "--user", "databyjp"],
+      "timeout_secs": 5,
+      "cache_ttl_secs": 900
+    },
+    "github_git": {
+      "command": ["/bin/sh", "-c", "token=$(/usr/bin/env -u GH_TOKEN -u GITHUB_TOKEN /opt/homebrew/bin/gh auth token --hostname github.com --user databyjp) || exit 1; test -n \"$token\" || exit 1; printf 'databyjp:%s' \"$token\""],
+      "timeout_secs": 5,
+      "cache_ttl_secs": 900
+    }
+  }
+}

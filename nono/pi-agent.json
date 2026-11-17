@@ -1,0 +1,11 @@
+{
+  "extends": ["jph-default", "nolabs-ai/pi", "gh-agent"],
+  "meta": {
+    "name": "pi-agent",
+    "description": "Pi for public OSS work as ar-woodhouse, without personal GitHub credential paths or Docker socket grants"
+  },
+  "filesystem": {
+    "allow": ["$HOME/.pi-lens"],
+    "read": ["$HOME/.cmuxterm/cmux-cli-shims"]
+  }
+}

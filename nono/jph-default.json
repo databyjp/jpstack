@@ -19,32 +19,15 @@
     "read": [
       "$HOME/.local/share/mise",
       "$HOME/.config/mise",
-      "$HOME/.config/gh",
       "$HOME/.agents/",
       "$HOME/.claude",
       "$HOME/.codex"
     ]
   },
   "network": {
-    "listen_port": [19432],
-    "credentials": ["gh_cli"],
-    "custom_credentials": {
-      "gh_cli": {
-        "upstream": "https://api.github.com",
-        "credential_key": "cmd://gh_cli",
-        "env_var": "GH_TOKEN",
-        "credential_format": "token {}"
-      }
-    }
+    "listen_port": [19432]
   },
   "environment": {
     "set_vars": { "PLANNOTATOR_PORT": "19432" }
-  },
-  "credential_capture": {
-    "gh_cli": {
-      "command": ["gh", "auth", "token"],
-      "timeout_secs": 5,
-      "cache_ttl_secs": 900
-    }
   }
 }
