@@ -12,8 +12,10 @@
     "npm:@narumitw/pi-worktree",
     "npm:pi-langfuse"
   ],
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "xhigh",
   "hideThinkingBlock": true,
   "quietStartup": true,
-  "theme": "dark",
-  "defaultThinkingLevel": "high"
+  "theme": "dark"
 }
