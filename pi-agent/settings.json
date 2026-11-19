@@ -8,6 +8,7 @@
     "npm:pi-lens",
     "npm:pi-calm",
     "npm:pi-subagents",
+    "npm:agents-cron",
     "https://github.com/earendil-works/pi-claude-code",
     "npm:@narumitw/pi-worktree",
     "npm:pi-langfuse"
