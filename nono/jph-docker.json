@@ -13,7 +13,8 @@
     "read": [
       "$HOME/.local/share/nono-docker-client"
     ],
-    "unix_socket": ["$HOME/.colima/agents/docker.sock"]
+    "unix_socket": ["$HOME/.colima/agents/docker.sock"],
+    "unix_socket_subtree": ["$HOME/.lima"]
   },
   "environment": {
     "deny_vars": [
@@ -30,5 +31,8 @@
   },
   "security": {
     "ipc_mode": "full"
+  },
+  "network": {
+    "open_port": [55123]
   }
 }
