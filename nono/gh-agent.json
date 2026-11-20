@@ -29,13 +29,6 @@
     }
   },
   "environment": {
-    "allow_vars": [
-      "PATH", "HOME", "USER", "LOGNAME", "SHELL",
-      "TERM", "COLORTERM", "TERM_PROGRAM", "TERM_PROGRAM_VERSION",
-      "LANG", "LC_*", "TMPDIR", "TMP", "TEMP", "PI_*", "AI_AGENT",
-      "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN",
-      "GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENROUTER_API_KEY"
-    ],
     "deny_vars": ["GH_*", "GITHUB_*", "GIT_*", "SSH_*", "GCM_*"],
     "set_vars": {
       "GH_CONFIG_DIR": "$HOME/.cache/nono-gh-agent",
