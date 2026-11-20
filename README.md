@@ -72,6 +72,12 @@ The core rules in [APPEND_SYSTEM.md](pi-agent/APPEND_SYSTEM.md) apply to replies
 
 The writing rules prioritize naming who does what, explaining relationships in familiar terms, and making the point easy to follow. Examples and review steps are conditional on what the reader needs. The [writing evaluation](tests/writing/README.md) provides fixed cases and a comparison procedure for future prompt revisions.
 
+## Scheduled tasks
+
+Use [agents-cron with launchd and nono](scheduled/README.md) for recurring work
+summaries, repository digests, and PR triage. The guide covers setup, prompts and
+working directories, task management, and the end-to-end sandbox smoke test.
+
 ## Sandbox
 
 Install [Nono](https://github.com/nolabs-ai/nono), then install or update the tracked profile through Nono's draft workflow:

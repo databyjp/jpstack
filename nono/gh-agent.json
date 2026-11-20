@@ -3,20 +3,6 @@
     "name": "gh-agent",
     "description": "Public GitHub work as ar-woodhouse; real credentials stay in the host proxy"
   },
-  "filesystem": {
-    "deny": [
-      "$HOME/.config/gh",
-      "$HOME/.config/git",
-      "$HOME/.gitconfig",
-      "$HOME/.git-credentials",
-      "$HOME/.ssh",
-      "$HOME/Library/Keychains",
-      "$HOME/.config/nono/profiles",
-      "$HOME/code/agents/jpstack/nono",
-      "$HOME/.colima",
-      "/var/run/docker.sock"
-    ]
-  },
   "network": {
     "allow_domain": ["*"],
     "credentials": ["github_api", "github_git"],

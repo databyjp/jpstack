@@ -10,9 +10,9 @@ These profiles configure Pi and Claude Code on this macOS machine. Development t
 | `claude-jph` | `databyjp` | Claude Code with the existing personal tooling and permissions |
 | `pi-agent` | `ar-woodhouse` | Autonomous public OSS fork-and-PR work |
 
-`gh-jph` and `gh-agent` configure the host-side credential proxy. Compose exactly one, last in the launch profile's `extends` list. The runtime packs explicitly disable inherited proxy credentials, so the identity component must follow them.
+`gh-jph` and `gh-agent` configure the host-side credential proxy. Compose exactly one, last in the launch profile's `extends` list, so its credentials are enabled after the runtime packs are resolved.
 
-`pi-agent` omits the Claude runtime component because that component grants broad Keychain access. It also omits `jph-docker`: Docker access should be added only after checking that the VM cannot expose personal credentials through host mounts. Existing personal profiles retain their Claude and Docker components.
+`pi-agent` and `pi-jph` share the same development, Docker, and Claude Code access through `jph-default`, `jph-docker`, `nolabs-ai/pi`, and `nolabs-ai/claude`. They differ in GitHub authentication, Git configuration, and inherited environment filtering. Choose between them for GitHub identity, not for stronger filesystem isolation; see [Permission boundaries](#permission-boundaries).
 
 ## Install the profiles
 
@@ -46,7 +46,7 @@ Your normal terminal must already have a stored `gh` login for `databyjp` on `gi
 
 ### Agent account
 
-Close older broad-access agent sessions before adding the token. Profile changes apply only to new sessions.
+Profile changes apply only to new sessions. Restart existing sessions after changing a profile or token.
 
 While signed into `ar-woodhouse`, create an expiring classic PAT at <https://github.com/settings/tokens/new>. Start with a 30-day lifetime and only the `public_repo` scope. Do not add `repo`, `workflow`, or administrative scopes for this public OSS workflow.
 
@@ -108,9 +108,7 @@ gh api user --jq .login
 # Expected: ar-woodhouse
 
 git var GIT_AUTHOR_IDENT
-nono why --self --path "$HOME/.config/gh" --op read
-nono why --self --path "$HOME/Library/Keychains" --op read
-# Both path queries should report DENIED.
+docker info
 ```
 
 Verify a read-only fetch from the intended checkout before authorizing a test branch push. Confirm the API identity before relying on it: the Keychain reference selects an item, not the GitHub account contained in its token. Keep pushes and PR creation subject to your normal review policy until those live checks pass.
@@ -119,11 +117,13 @@ Verify a read-only fetch from the intended checkout before authorizing a test br
 
 - The agent Git route permits smart-HTTP fetches and permits `git-receive-pack` only under `/ar-woodhouse/`. It rejects Git pushes to other owners. This is an owner-level rule, not a selected-repository rule.
 - The GitHub API route supports normal `gh` commands, including GraphQL. It is **not repository-restricted**: the PAT's `public_repo` scope and the agent account's memberships define its API authority. Do not grant that account more public-repository authority than intended.
-- The agent profile filters inherited environment variables, blocks conventional personal GitHub/Git/SSH credential paths, and blocks the symlink-backed profile source. It grants no Docker socket access. Its standard deny groups keep Keychain files protected.
+- `gh-agent` allows only selected inherited environment variables and strips inherited `GH_*`, `GITHUB_*`, `GIT_*`, `SSH_*`, and `GCM_*` values before injecting its own settings. `gh-jph` strips a smaller set and has no environment allowlist. `gh-agent` adds no filesystem deny rules beyond the inherited profiles.
+- Both Pi profiles inherit `jph-docker`, which selects the Colima `agents` daemon. See [Colima setup](../README.md#colima-setup) for its host mounts. Containers can access mounted host paths independently of nono's filesystem restrictions.
+- Both Pi profiles inherit the Claude runtime's read/write grant and protection bypass for `~/Library/Keychains`. Inherited deny groups still protect other conventional secret paths such as `~/.ssh` and `~/.docker`.
 - `allow_domain: ["*"]` preserves general development network access through the proxy. These are not general-purpose egress allowlists.
-- Pi state and development working trees remain shared. Do not put personal GitHub tokens in those locations. This configuration separates conventional credential sources; it does not create a separate OS account or make arbitrary shared files secret.
-- These profiles target macOS. The agent uses deny-within-allow rules under the shared code directory; Linux Landlock cannot enforce that arrangement in the same way.
+- Pi state and development working trees remain shared, including the profile source under `~/code`. Do not put personal GitHub tokens in shared state or checkouts. This configuration selects GitHub identities for normal commands; it does not isolate those identities against arbitrary code with access to shared files or credentials.
+- These profiles target macOS; their Keychain permissions are macOS-specific.
 
-Private work requires an explicit personal-profile launch. A correctly scoped agent PAT cannot grant access to private repositories, and a missing or rejected agent credential does not select the personal route.
+Use `pi-jph` for GitHub operations that require your personal account, including private-repository access. A correctly scoped agent PAT cannot grant access to private repositories, and a missing or rejected agent credential does not select the personal route.
 
 For token rotation, update the Keychain item from your normal terminal and restart agent sessions. The proxy keeps credentials in memory, and Git captures are cached for up to 900 seconds.

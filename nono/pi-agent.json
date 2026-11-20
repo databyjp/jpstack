@@ -1,8 +1,8 @@
 {
-  "extends": ["jph-default", "nolabs-ai/pi", "gh-agent"],
+  "extends": ["jph-default", "jph-docker", "nolabs-ai/pi", "nolabs-ai/claude", "gh-agent"],
   "meta": {
     "name": "pi-agent",
-    "description": "Pi for public OSS work as ar-woodhouse, without personal GitHub credential paths or Docker socket grants"
+    "description": "Pi for public OSS work as ar-woodhouse, with the same development, Docker, and Claude Code access as pi-jph"
   },
   "filesystem": {
     "allow": ["$HOME/.pi-lens"],

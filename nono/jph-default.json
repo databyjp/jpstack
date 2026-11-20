@@ -11,6 +11,7 @@
       "$HOME/.worktrees/",
       "$HOME/.codegraph/",
       "$HOME/.local/state/mise/",
+      "$HOME/.agents/cron/",
       "$HOME/code",
       "$HOME/go/pkg",
       "$HOME/Documents/ObsidianVaults/jph-weaviate",
