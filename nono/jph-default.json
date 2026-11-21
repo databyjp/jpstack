@@ -26,7 +26,8 @@
     ]
   },
   "network": {
-    "listen_port": [19432]
+    "listen_port": [19432],
+    "open_port": [11434]
   },
   "environment": {
     "allow_vars": [
