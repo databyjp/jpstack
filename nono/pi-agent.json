@@ -1,5 +1,5 @@
 {
-  "extends": ["jph-default", "jph-docker", "nolabs-ai/pi", "nolabs-ai/claude", "gh-agent"],
+  "extends": ["jph-default", "jph-docker", "nolabs-ai/pi", "nolabs-ai/claude", "nolabs-ai/opencode", "gh-agent"],
   "meta": {
     "name": "pi-agent",
     "description": "Pi for public OSS work as ar-woodhouse, with the same development, Docker, and Claude Code access as pi-jph"

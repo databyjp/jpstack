@@ -14,11 +14,13 @@
       "$HOME/.agents/cron/",
       "$HOME/code",
       "$HOME/go/pkg",
+      "$HOME/.config/notion/config.json",
       "$HOME/Documents/ObsidianVaults/jph-weaviate",
       "$HOME/Documents/ObsidianVaults/WeaviateBrain26"
     ],
     "read": [
       "$HOME/.local/share/mise",
+      "$HOME/.yarnrc",
       "$HOME/.config/mise",
       "$HOME/.agents/",
       "$HOME/.claude",
